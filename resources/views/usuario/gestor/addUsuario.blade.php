@@ -147,7 +147,7 @@
                                     <div class="form-group">
                                         <select class="form-group form-select" id="rol" name="rol">
                                             @foreach($rols as $rol)
-                                                <option value="{{$rol->nombre}}">{{$rol->nombre}}</option>
+                                                <option value="{{$rol->id_rol}}">{{$rol->nombre}}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -160,7 +160,7 @@
                                             @foreach($servicios as $servicio)
                                                 <option value="{{$servicio->nombre_servicio}}">{{$servicio->nombre_servicio}}</option>
                                             @endforeach
-                                            <option value="">Ninguno</option>
+                                            <option value="0">Ninguno</option>
                                         </select>
                                     </div>
                                 </div>

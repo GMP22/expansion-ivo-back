@@ -22,7 +22,7 @@ class RolController extends Controller
      */
     public function index()
     {
-        $rols = Rol::all();
+        $rols = Rol::all()->except(0);;
         return view('usuario.gestor.rol.rol', compact('rols'));
     }
    

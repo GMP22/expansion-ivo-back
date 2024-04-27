@@ -20,7 +20,7 @@ class ServicioController extends Controller
         ];
         $usuarios = new Usuario();
 
-        $usuarios = UsuariosNoJefesResource::Collection(Usuario::where([['id_rol', "!=", "1"], ['id_rol', "!=", "3"], ['esJefe', "==", false]])->get());
+        $usuarios = UsuariosNoJefesResource::Collection(Usuario::where([['id_rol', "!=", "1"], ['id_rol', "!=", "3"], ['id_rol', "!=", "0"],['esJefe', "==", false]])->get());
 
         return view('usuario.gestor.servicio.addServicio', compact('breadcrumbs', 'usuarios'));
     }
@@ -30,7 +30,7 @@ class ServicioController extends Controller
      */
     public function index()
     {
-        $servicios = Servicio::all();
+        $servicios = Servicio::all()->except(0);
         return view('usuario.gestor.servicio.servicio', compact('servicios'));
     }
 
@@ -104,7 +104,7 @@ class ServicioController extends Controller
         
         $usuarios = new Usuario();
         $usuarioActual = Usuario::find($servicio->jefe_departamento);
-        $usuariosAEscoger = UsuariosNoJefesResource::Collection(Usuario::where([['id_rol', "!=", "1"], ['id_rol', "!=", "3"], ['esJefe', "==", false]])->get());
+        $usuariosAEscoger = UsuariosNoJefesResource::Collection(Usuario::where([['id_rol', "!=", "1"], ['id_rol', "!=", "3"], ['id_rol', "!=", "0"], ['esJefe', "==", false]])->get());
 
         return view('usuario.gestor.servicio.edit', compact('servicio', 'breadcrumbs', 'usuarioActual', 'usuariosAEscoger'));
     }

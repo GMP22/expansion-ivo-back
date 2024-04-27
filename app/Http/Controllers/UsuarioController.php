@@ -9,6 +9,7 @@ use App\Models\Medico;
 use App\Models\Gestor;
 use App\Models\Radiologo;
 use App\Models\Administrativo;
+use App\Models\GestorLogistico;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -53,8 +54,8 @@ class UsuarioController extends Controller
             ['nav-opcion-1' => 'Usuarios', 'routa-opcion-1' => route('gestor.usuario')],
             ['nav-opcion-2' => 'Alta Usuario', 'routa-opcion-2' => null]
         ];
-        $servicios = Servicio::all();
-        $rols = Rol::all();
+        $servicios = Servicio::all()->except(0);
+        $rols = Rol::all()->except(0);
         return view('usuario.gestor.addUsuario', compact('breadcrumbs', 'servicios', 'rols'));
     }
   
@@ -115,7 +116,7 @@ class UsuarioController extends Controller
             'telefono' => 'required|numeric|digits:9',
             'usuario' => 'required|string|max:255',
             'password' => 'required|string|min:8|confirmed',
-            'rol' => 'required|exists:rols,nombre',
+            'rol' => 'required',
         ], $messages);
 
         if ($validator->fails()) {
@@ -124,17 +125,14 @@ class UsuarioController extends Controller
                         ->withInput();
         }
         $validatedData = $validator->validated();
-
+        $idRol = $validatedData['rol'];
         $nombreServicio = $request->servicio;
-        $nombreRol = $validatedData['rol'];
-        $rol = Rol::where('nombre', $validatedData['rol'])->first();
-
         $user = Usuario::create([
             'dni' => $validatedData['dni'],
             'nombre' => $validatedData['nombre'],
             'correo' => $validatedData['correo'],
             'password' => Hash::make($validatedData['password']),
-            'id_rol' => $rol->id_rol,
+            'id_rol' => $validatedData['rol'],
             'apellido1' => $validatedData['apellido1'],
             'apellido2' => $validatedData['apellido2'],
             'Sexo' => $validatedData['sexo'],
@@ -147,19 +145,19 @@ class UsuarioController extends Controller
         ]);
         
 
-        $this->anyadirUsuarioEspecifico($nombreRol, $user, $nombreServicio);
+        $this->anyadirUsuarioEspecifico($idRol, $user, $nombreServicio);
         
         return redirect()->route('gestor.usuario')->with('success', 'Usuario creado correctamente.');
         
     }
-    public function anyadirUsuarioEspecifico($nombreRol, $user, $nombreServicio){
-        switch($nombreRol){
-            case 'Gestor':
+    public function anyadirUsuarioEspecifico($idRol, $user, $nombreServicio){
+        switch($idRol){
+            case 1:
                 Gestor::create([
                     'id_usuario_gestor' => $user->id_usuario,
                 ]);
                 break;
-            case 'Medico':
+            case 2:
                 $servicio = Servicio::where('nombre_servicio', $nombreServicio)->first();
                 Medico::create([
                     'id_usuario_medico' =>  $user->id_usuario,     
@@ -167,7 +165,7 @@ class UsuarioController extends Controller
                     'id_servicio' =>   $servicio->id_servicio,          
                 ]);
                 break;
-            case 'Radiologo':
+            case 4:
                 $servicio = Servicio::where('nombre_servicio', $nombreServicio)->first();
                 Radiologo::create([
                     'id_usuario_radiologo' => $user->id_usuario, 
@@ -175,12 +173,18 @@ class UsuarioController extends Controller
                     'id_servicio' =>   $servicio->id_servicio,
                 ]);
                 break;
-            case 'Administrativo':
+            case 5:
                 Administrativo::create([
                     'id_usuario_administrativo' => $user->id_usuario, 
                     'id_usuario_gestor' => Auth::guard('usuario')->user()->id_usuario,
                 ]);
                 break;
+            case 6:
+                GestorLogistico::create([
+                    'id_usuario_gestor_logistico' => $user->id_usuario, 
+                    'id_usuario_gestor' => Auth::guard('usuario')->user()->id_usuario,
+                ]);
+            break;    
         }
     }
   

@@ -38,6 +38,7 @@ class Usuario extends Authenticatable implements JWTSubject
         'password',
         'id_rol',
         'telefono',
+        'esJefe',
     ];
 
     public function rol()

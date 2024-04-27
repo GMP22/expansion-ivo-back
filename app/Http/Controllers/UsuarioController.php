@@ -143,6 +143,7 @@ class UsuarioController extends Controller
             'fecha_nacimiento' => $validatedData['fechaNac'],
             'telefono' => $validatedData['telefono'],
             'nombre_cuenta' => $validatedData['usuario'],
+            'esJefe' => false,
         ]);
         
 
@@ -158,7 +159,7 @@ class UsuarioController extends Controller
                     'id_usuario_gestor' => $user->id_usuario,
                 ]);
                 break;
-            case 'Médico':
+            case 'Medico':
                 $servicio = Servicio::where('nombre_servicio', $nombreServicio)->first();
                 Medico::create([
                     'id_usuario_medico' =>  $user->id_usuario,     
@@ -166,7 +167,7 @@ class UsuarioController extends Controller
                     'id_servicio' =>   $servicio->id_servicio,          
                 ]);
                 break;
-            case 'Radiólogo':
+            case 'Radiologo':
                 $servicio = Servicio::where('nombre_servicio', $nombreServicio)->first();
                 Radiologo::create([
                     'id_usuario_radiologo' => $user->id_usuario, 
@@ -266,8 +267,6 @@ class UsuarioController extends Controller
         }
         $validatedData = $validator->validated();
 
-        
-
         $updateData = [
             'dni' => $validatedData['dni'],
             'nombre' => $validatedData['nombre'],
@@ -312,10 +311,10 @@ class UsuarioController extends Controller
         $usuario = Usuario::findOrFail($id);
         $servicio = "";
         $rol = Rol::find($usuario->id_rol);
-        if($rol->nombre == "Médico"){
+        if($rol->nombre == "Medico"){
             $medico = Medico::find($usuario->id_usuario);
             $servicio = Servicio::find($medico->id_servicio);
-        }else if($rol->nombre == "Radiólogo"){
+        }else if($rol->nombre == "Radiologo"){
             $radiologo = Radiologo::find($usuario->id_usuario);
             $servicio = Servicio::find($radiologo->id_servicio);
         }

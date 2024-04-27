@@ -11,6 +11,7 @@ class Servicio extends Model
     protected $primaryKey = 'id_servicio';
     protected $fillable = [
         'nombre_servicio',
+        'jefe_departamento',
         'fecha_creacion',
         'id_usuario_gestor',
     ];

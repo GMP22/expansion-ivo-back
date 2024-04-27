@@ -19,7 +19,7 @@ class AuthFrontController extends Controller
         //$credentials['password'] = bcrypt($credentials['password']);
 
         if (! $token = auth() ->attempt($credentials)) {
-            return response()->json(['error' => 'No autorizado'], 401);
+            return response()->json(['error' => $credentials["password"]], 401);
         }
 
         $user = auth()->user(); // Obtener el usuario autenticado

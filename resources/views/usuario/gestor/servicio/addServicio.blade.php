@@ -121,6 +121,20 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <div class="col-4">
+                                    <label for="fecha_creacion" class="my-3 label-personalizado">Jefe De Departamento</label>
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <select class="form-select" aria-label="Default select example" name="jefe_departamento" id="jefe_departamento">
+                                                <option selected>Jefe de Departamento...</option>
+                                            @foreach($usuarios as $usuario)
+                                                <option value="{{$usuario->id_usuario}}">{{$usuario->nombre}}</option>
+                                            @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                         
@@ -147,6 +161,19 @@
                                     <div class="form-group">
                                         <div class="input-group">
                                             <input type="date" class="form-control input-style"  id="fecha_creacion_disabled" disabled>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-4">
+                                    <label for="fecha_creacion" class="my-3 label-personalizado">Jefe De Departamento</label>
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <select class="form-select" aria-label="Default select example" id="jefe_departamento_disabled" disabled>
+                                            @foreach($usuarios as $usuario)
+                                                <option>{{$usuario->nombre}}</option>
+                                            @endforeach
+                                            </select>
                                         </div>
                                     </div>
                                 </div>

@@ -50,7 +50,7 @@ Route::group(['middleware' => 'gestor'], function(){
     Route::get('/servicio/add-servicio', [ServicioController::class, 'addServicio'])->name('gestor.add-servicio');
     Route::post('/servicio/add-servicio/anyadir', [ServicioController::class, 'store'])->name('servicio.crear');
     Route::post('/servicio/{id}/editar/modificar', [ServicioController::class, 'update'])->name('servicio.modificar');
-    Route::get('/servicio/{id}/editar', [ServicioController::class, 'edit'])->name('servicio.edit');;
+    Route::get('/servicio/{id}/editar', [ServicioController::class, 'edit'])->name('servicio.edit');
 
 
     //Routas Rol

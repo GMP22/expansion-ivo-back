@@ -60,6 +60,19 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-4">
+                                    <label for="fecha_creacion" class="my-3 label-personalizado">Jefe De Departamento</label>
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <select class="form-select" aria-label="Default select example" name="jefe_departamento" id="jefe_departamento">
+                                                <option value="{{$usuarioActual->id_usuario}}" selected>{{$usuarioActual->nombre}}</option>
+                                            @foreach($usuariosAEscoger as $usuario)
+                                                <option value="{{$usuario->id_usuario}}">{{$usuario->nombre}}</option>
+                                            @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
                             <div class="row mt-5">
                             <div class="col-12 d-flex justify-content-end">
                                 <input type="submit" class="btn-pasos mx-2" value="Modificar">

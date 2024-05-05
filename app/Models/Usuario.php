@@ -75,7 +75,18 @@ class Usuario extends Authenticatable implements JWTSubject
         return $this->hasOne(Radiologo::class, 'id_usuario_radiologo');
     }
 
+    public function pedidos()
+    {
+        return $this->hasMany(Pedidos::class, 'id_usuario_solicitante', 'id_usuario');
+    }
 
+    public function usuarioConPedidosAutomaticos(){
+        return $this -> belongsToMany(Usuario::class, 'articulos_automatizado', 'id_articulo', 'id_usuario', 'id_proveedor');
+    }
+
+    public function lotesAgarradosPorUsuario(){
+        return $this -> belongsToMany(Usuario::class, 'lotes_solicitados', 'id_pedido_proveniente', 'id_pedido_receptor', 'id_articulo', 'id_usuario_solicitante');
+    }
     /**
      * The attributes that should be hidden for serialization.
      *

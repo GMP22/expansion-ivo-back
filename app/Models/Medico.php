@@ -31,4 +31,7 @@ class Medico extends Model
     {
         return $this->belongsTo(Servicio::class, 'id_servicio', 'id_servicio');
     }
+    public function articulosMedicos(){
+        return $this->belongsToMany(Medico::class, 'inventario_medico', 'id_usuario_medico', 'id_articulo_departamento')
+    }
 }

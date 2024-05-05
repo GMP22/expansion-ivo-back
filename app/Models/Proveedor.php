@@ -24,7 +24,7 @@ class Proveedor extends Model
     protected $primaryKey = 'id_proveedor';
 
     public function articulos(){
-        return $this -> belongsToMany(AlmacenGeneral::class, 'articulos_por_proveedor', 'id_articulo', 'id_proveedor');
+        return $this -> belongsToMany(AlmacenGeneral::class, 'articulos_por_proveedor',  'id_proveedor', 'id_articulo')->withPivot('cantidad_por_lote', 'coste_por_lote');
     }
 
     public function proveedorConPedidosAutomaticos(){

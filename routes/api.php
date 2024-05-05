@@ -76,10 +76,8 @@ Route::group([
     Route::get('prueba/{id}', [App\Http\Controllers\Api\V1\PruebaController::class, 'getPrueba']);
     Route::get('pruebas-paciente/{id}', [App\Http\Controllers\Api\V1\PruebaController::class, 'getAllPruebasPaciente']);
     Route::get('informacion-prueba/{id}', [App\Http\Controllers\Api\V1\PruebaController::class, 'getPruebaByPruebaId']);
-
     
     Route::get('obtener-personal/{id_rol}', [App\Http\Controllers\Api\V1\UsuarioController::class, 'show']);
-
 
     Route::get('citas-pendiente-radiologo/{fecha}/{id_radiologo}', [App\Http\Controllers\Api\V1\CitaController::class, 'getCitasPendientesRadiologo']);
     Route::get('citas-realizada-radiologo/{fecha}/{id_radiologo}', [App\Http\Controllers\Api\V1\CitaController::class, 'getCitasRealizadaRadiologo']);
@@ -88,6 +86,12 @@ Route::group([
     Route::delete('imagen/{id}', [App\Http\Controllers\Api\V1\ImagenController::class, 'eliminarImagen']);
     Route::post('actualizar-prueba/{id}', [App\Http\Controllers\Api\V1\PruebaController::class, 'actualizarPrueba']);
 
+    Route::get('pedidos/{id}', [App\Http\Controllers\Api\V1\PedidosController::class, 'mostrarPedidosSegunId']);
+    Route::get('pedidos-pendientes-gestor/{id}', [App\Http\Controllers\Api\V1\PedidosController::class, 'pedidosPendientesGestor']);
+    Route::get('pedidos-recibidos-gestor/{id}', [App\Http\Controllers\Api\V1\PedidosController::class, 'pedidosRecibidosGestor']);
+
+    Route::get('pedidos-pendientes-medico/{id}/{estado}', [App\Http\Controllers\Api\V1\PedidosController::class, 'pedidosPendientesMedico']);
+    Route::get('pedidos-recibidos-medico/{id}/{estado}', [App\Http\Controllers\Api\V1\PedidosController::class, 'pedidosRecibidosMedico']);
 });
 
 Route::apiResource('v1/pacientes', App\Http\Controllers\Api\V1\PacienteController::class);

@@ -31,7 +31,7 @@ class AlmacenGeneral extends Model
     }
 
     public function pedidos(){
-        return $this -> belongsToMany(Pedidos::class, 'articulos_por_pedido', 'id_pedido', 'id_numero_articulo', 'id_proveedor');
+        return $this -> belongsToMany(Pedidos::class, 'articulos_por_pedido', 'id_pedido', 'numero_articulo', 'id_proveedor');
     }
 
     public function articuloConPedidosAutomaticos(){

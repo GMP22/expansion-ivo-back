@@ -28,7 +28,7 @@ class Servicio extends Model
         return $this->hasMany(Radiologo::class, 'id_servicio');
     }
     public function articulosDepartamento(){
-        return $this->belongsToMany(InventarioClinica::class, 'inventario_departamentos', 'id_departamento', 'id_articulo_clinica')
+        return $this->belongsToMany(InventarioClinica::class, 'inventario_departamentos', 'id_departamento', 'id_articulo_clinica');
     }
     
 }

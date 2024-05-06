@@ -19,15 +19,13 @@ class PedidosController extends Controller
         return 1;
     }
     
-    public function mostrarPedidosSegunId($id)
-    {
+    public function mostrarPedidosSegunId($id){
         $user = Usuario::find($id);
         $pedidosDeUser = $user -> pedidos;
-        return response()->json([$pedidosDeUser]);
+        return response()->json($pedidosDeUser);
     }
 
-    public function pedidosPendientesGestor($id)
-    {   
+    public function pedidosPendientesGestor($id){   
         $user = Usuario::find($id);
         $pedido = $user -> pedidos -> where("fecha_aceptada", null);
 
@@ -39,10 +37,10 @@ class PedidosController extends Controller
             $numero_productos = $value->articulos->count(); 
             $proveedor = Proveedor::find($value->proveedores[0]->id_proveedor);
             $x = $proveedor -> articulos;
-            $articulos = [];
+            $costeArticulos = 0;
                 
                 for ($j=0; $j < $numero_productos; $j++) { 
-                    $articulos [] = $x[$j]->pivot->coste_por_lote * $value->articulos[$j]->pivot->lotes_recibidos;
+                    $costeArticulos += $x[$j]->pivot->coste_por_lote * $value->articulos[$j]->pivot->lotes_recibidos;
                 }
 
             $p = [
@@ -50,7 +48,7 @@ class PedidosController extends Controller
                 'proveedor' => $value->proveedores[0]->nombre,
                 'fecha_inicial' => $value->fecha_inicial,
                 'numero_productos' => $numero_productos,
-                'coste' => $articulos, 
+                'coste' => $costeArticulos, 
             ];
            
             $pedidosResultantes[] = $p;
@@ -58,10 +56,74 @@ class PedidosController extends Controller
         return response()->json($pedidosResultantes);
     }
 
-    public function pedidosRecibidosGestor($id)
-    {
-        $pedidosDeUser = Pedidos::where([['id_usuario_solicitante', '=', $id], ['estado', '!=', 'En Transito']])->get();
-        return response()->json($pedidosDeUser);
+    public function pedidosRecibidosGestor($id){
+         
+            $user = Usuario::find($id);
+            $pedido = $user -> pedidos -> where("estado", "Recibido");
+    
+            $pedidosResultantes = [];
+            $nombre_proveedor = null;
+            $numero_productos = null;
+            foreach ($pedido as $key => $value) {
+                $nombre_proveedor = $value[0];
+                $numero_productos = $value->articulos->count(); 
+                $proveedor = Proveedor::find($value->proveedores[0]->id_proveedor);
+                $x = $proveedor -> articulos;
+                $costeArticulos = 0;
+                    
+                    for ($j=0; $j < $numero_productos; $j++) { 
+                        $costeArticulos += $x[$j]->pivot->coste_por_lote * $value->articulos[$j]->pivot->lotes_recibidos;
+                    }
+    
+                $p = [
+                    'pedido' => $value->id_pedido,
+                    'proveedor' => $value->proveedores[0]->nombre,
+                    'fecha_inicial' => $value->fecha_inicial,
+                    'fecha_aceptada' => $value->fecha_aceptada,
+                    'numero_productos' => $numero_productos,
+                    'coste' => $costeArticulos, 
+                ];
+               
+                $pedidosResultantes[] = $p;
+            };
+            return response()->json($pedidosResultantes);
+        
+    }
+
+    public function solicitudesEntrantesGestor($id){
+        $pedidos = Pedidos::where([['es_departamento', '=', true], ['estado', '=', "Pendiente"]])->get();
+        $pedidosResultantes = [];
+        foreach ($pedidos as $key => $value) {
+            $departamento = $value->servicio;
+            $articulos = $value->articulos->count();
+            $p = [
+                'solicitud' => $value->id_pedido,
+                'nombre_departamento' => $departamento->nombre_servicio,
+                'numero_productos' => $articulos,
+                'fecha_inicial' => $value->fecha_inicial,
+            ];
+            $pedidosResultantes[] = $p;
+        }
+        return response()->json($pedidosResultantes);
+    }
+
+    public function solicitudesAceptadasGestor($id){
+        $pedidos = Pedidos::where([['es_departamento', '=', true], ['estado', '=', "Aceptado"]])->get();
+        $pedidosResultantes = [];
+        foreach ($pedidos as $key => $value) {
+            $departamento = $value->servicio;
+            $articulos = $value->articulos->count();
+            $p = [
+                'solicitud' => $value->id_pedido,
+                'id_servicio' => $departamento->id_servicio,
+                'nombre_departamento' => $departamento->nombre_servicio,
+                'numero_productos' => $articulos,
+                'fecha_inicial' => $value->fecha_inicial,
+                'fecha_aceptada' => $value->fecha_aceptada,
+            ];
+            $pedidosResultantes[] = $p;
+        }
+        return response()->json($pedidosResultantes);
     }
 
     /**

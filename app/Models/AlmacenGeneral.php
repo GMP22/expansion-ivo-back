@@ -19,7 +19,7 @@ class AlmacenGeneral extends Model
     protected $primaryKey = 'id_articulo';
 
     public function categoria(){
-        return $this-> hasOne(CategoriaArticulo::class, 'id_categoria', 'id_categoria');
+        return $this-> hasOne(CategoriaArticulos::class, 'id_categoria', 'id_categoria');
     }
 
     public function fabricante(){

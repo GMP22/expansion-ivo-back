@@ -25,10 +25,10 @@ class InventarioClinica extends Model
     }
 
     public function departamentos(){
-        return $this->belongsToMany(Servicio::class, 'inventario_departamentos', 'id_departamento', 'id_articulo_clinica')
+        return $this->belongsToMany(Servicio::class, 'inventario_departamentos', 'id_departamento', 'id_articulo_clinica');
     }
 
     public function medicos(){
-        return $this->belongsToMany(Medico::class, 'inventario_medico', 'id_usuario_medico', 'id_articulo_departamento')
+        return $this->belongsToMany(Medico::class, 'inventario_medico', 'id_usuario_medico', 'id_articulo_departamento');
     }
 }

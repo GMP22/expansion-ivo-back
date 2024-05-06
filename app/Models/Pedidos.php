@@ -15,6 +15,7 @@ class Pedidos extends Model
         'fecha_aceptada',
         'estado', 
         'es_departamento',
+        'id_servicio',
     ];
 
     protected $table = 'pedidos';
@@ -32,6 +33,10 @@ class Pedidos extends Model
     public function proveedores(){
         //return $this -> belongsToMany(AlmacenGeneral::class, 'articulos_por_pedido', 'id_pedido', 'id_numero_articulo', 'id_proveedor');
         return $this -> belongsToMany(Proveedor::class, 'articulos_por_pedido', 'id_pedido', 'id_proveedor');
+    }
+
+    public function servicio(){
+        return $this -> hasOne(Servicio::class, 'id_servicio', 'id_servicio');
     }
 
     public function lotesAgarradosPorPedido(){

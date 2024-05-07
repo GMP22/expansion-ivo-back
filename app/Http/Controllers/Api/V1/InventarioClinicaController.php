@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\InventarioClinica;
 use App\Models\CategoriaArticulos;
+use App\Models\Usuario;
 
 class InventarioClinicaController extends Controller
 {
@@ -20,10 +21,20 @@ class InventarioClinicaController extends Controller
                 $nombreArticulo = $value -> articulo -> nombre;
                 $categoria = $value -> articulo -> categoria -> nombre_categoria;
                 $lotesDisponibles = $value -> lotes_disponibles;
+
+                $pedidos = $value -> articulo -> pedidos -> where('es_departamento', '=', false) -> where('estado', '=', "Recibido");
+                $fechas = [];
+                    foreach ($pedidos as $key2 => $value2) {
+                            if ($value2 -> usuario -> rol -> id_rol == 6) { // numero de rol del gestor logistico
+                                $fechas [] = $value2 -> fecha_aceptada;
+                            }
+                    }
+                
                 $a = [
                     'nombre_articulo' => $nombreArticulo,
                     'nombre_categoria' => $categoria,
                     'numero_lotes' => $lotesDisponibles,
+                    'ultima_fecha_recibida' => $fechas[array_key_last($fechas)],
                 ];
                 $articulosResultantes[] = $a;
             }

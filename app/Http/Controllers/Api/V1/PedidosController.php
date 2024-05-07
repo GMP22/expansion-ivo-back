@@ -56,6 +56,27 @@ class PedidosController extends Controller
         return response()->json($pedidosResultantes);
     }
 
+    public function detallesPedido($id){
+        $pedido = Pedidos::find($id);
+        $articulos = $pedido -> articulos;
+        $detalle = [];
+
+        foreach ($articulos as $key => $value) {
+            $costePorLote = $value -> proveedores -> where('id_proveedor', $value->pivot->id_proveedor) -> first() -> pivot -> coste_por_lote;
+
+            $d = [
+                'nombre' => $value -> nombre,
+                'lotes_recibidos' => $value -> pivot -> lotes_recibidos,
+                'coste_por_lote' => $costePorLote,
+                'precio' => $value -> pivot -> lotes_recibidos*$costePorLote
+            ];
+
+            $detalle [] = $d;
+        }
+         
+        return response()->json($detalle);
+    }
+
     public function pedidosRecibidosGestor($id){
          
             $user = Usuario::find($id);

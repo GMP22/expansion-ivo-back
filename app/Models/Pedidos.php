@@ -21,13 +21,13 @@ class Pedidos extends Model
     protected $table = 'pedidos';
     protected $primaryKey = 'id_pedido';
 
-    public function usuario_solicitante(){
-        return $this-> hasOne(Usuario::class, 'id_usuario_solicitante', 'id_usuario');
+    public function usuario(){
+        return $this-> belongsTo(Usuario::class, 'id_usuario_solicitante', 'id_usuario');
     }
 
     public function articulos(){
         //return $this -> belongsToMany(AlmacenGeneral::class, 'articulos_por_pedido', 'id_pedido', 'id_numero_articulo', 'id_proveedor');
-        return $this -> belongsToMany(AlmacenGeneral::class, 'articulos_por_pedido', 'id_pedido', 'numero_articulo')->withPivot('lotes_recibidos');
+        return $this -> belongsToMany(AlmacenGeneral::class, 'articulos_por_pedido', 'id_pedido', 'numero_articulo')->withPivot('lotes_recibidos', 'id_proveedor');
     }
 
     public function proveedores(){

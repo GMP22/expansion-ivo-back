@@ -44,7 +44,7 @@ class PedidosController extends Controller
                 }
 
             $p = [
-                'pedido' => $value->id_pedido,
+                'id_pedido' => $value->id_pedido,
                 'proveedor' => $value->proveedores[0]->nombre,
                 'fecha_inicial' => $value->fecha_inicial,
                 'numero_productos' => $numero_productos,
@@ -97,7 +97,7 @@ class PedidosController extends Controller
                     }
     
                 $p = [
-                    'pedido' => $value->id_pedido,
+                    'id_pedido' => $value->id_pedido,
                     'proveedor' => $value->proveedores[0]->nombre,
                     'fecha_inicial' => $value->fecha_inicial,
                     'fecha_aceptada' => $value->fecha_aceptada,

@@ -98,8 +98,8 @@ Route::group([
     Route::get('detalles-pedido-gestor/{id}', [App\Http\Controllers\Api\V1\PedidosController::class, 'detallesPedido']);
    
     Route::get('inventario-gestor', [App\Http\Controllers\Api\V1\InventarioClinicaController::class, 'index']);
-
-    
+    Route::get('articulos-crear-pedido', [App\Http\Controllers\Api\V1\AlmacenGeneralController::class, 'articulosCrearPedido']);
+    Route::get('detalles-articulo-crear-pedido/{id}', [App\Http\Controllers\Api\V1\AlmacenGeneralController::class, 'detallesArticulosCrearPedido']);
 });
 
 Route::apiResource('v1/pacientes', App\Http\Controllers\Api\V1\PacienteController::class);

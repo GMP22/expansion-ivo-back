@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\AlmacenGeneral;
-
+use App\Models\Proveedor;
 class AlmacenGeneralController extends Controller
 {
     /**
@@ -34,8 +34,6 @@ class AlmacenGeneralController extends Controller
             $paquete = [
                 'id_proveedor' => $value -> id_proveedor,
                 'nombre_proveedor' => $value -> nombre,
-                'cantidad_por_lote' => $value -> pivot -> cantidad_por_lote,
-                'coste_por_lote' => $value -> pivot -> coste_por_lote,
             ];
 
             $datosProveedores [] = $paquete;
@@ -49,9 +47,11 @@ class AlmacenGeneralController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function detallesArticulosSegunProveedor($idArticulo, $idProveedor)
     {
-        //
+        $proveedor = Proveedor::find($idProveedor) -> articulos -> where('id_articulo', $idArticulo) -> first();
+
+        return response()->json([$proveedor -> pivot -> cantidad_por_lote, $proveedor -> pivot -> coste_por_lote]);
     }
 
     /**

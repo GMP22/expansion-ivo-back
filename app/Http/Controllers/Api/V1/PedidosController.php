@@ -147,6 +147,11 @@ class PedidosController extends Controller
         return response()->json($pedidosResultantes);
     }
 
+    public function registrarPedidosGestor($idUsuario, Request $request){
+
+        return response()->json($request, 200);
+    }
+
     /**
      * Show the form for creating a new resource.
      */

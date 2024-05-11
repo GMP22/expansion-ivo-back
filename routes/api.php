@@ -102,6 +102,8 @@ Route::group([
     Route::get('detalles-articulo-crear-pedido/{id}', [App\Http\Controllers\Api\V1\AlmacenGeneralController::class, 'detallesArticulosCrearPedido']);
     Route::get('detalles-articulo-segun-proveedor/{idArticulo}/{idProveedor}', [App\Http\Controllers\Api\V1\AlmacenGeneralController::class, 'detallesArticulosSegunProveedor']);
     Route::get('articulo-segun-proveedor/{idArticulo}', [App\Http\Controllers\Api\V1\AlmacenGeneralController::class, 'proveedoresSegunArticulo']);
+
+    Route::post('registrar-pedido-gestor/{idArticulo}', [App\Http\Controllers\Api\V1\PedidosController::class,'registrarPedidosGestor']);
 });
 
 Route::apiResource('v1/pacientes', App\Http\Controllers\Api\V1\PacienteController::class);

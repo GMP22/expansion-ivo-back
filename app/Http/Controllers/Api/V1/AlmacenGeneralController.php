@@ -44,6 +44,20 @@ class AlmacenGeneralController extends Controller
         return response()->json($datosFinales);
     }
 
+    public function proveedoresSegunArticulo($idArticulo){
+        $proveedor = AlmacenGeneral::find($idArticulo) -> proveedores;
+        $datosProveedores = [];
+        foreach ($proveedor as $key => $value) {
+            $paquete = [
+                'id_proveedor' => $value -> id_proveedor,
+                'nombre_proveedor' => $value -> nombre,
+            ];
+
+            $datosProveedores [] = $paquete;
+        }
+        return response()->json($datosProveedores);
+    }
+
     /**
      * Store a newly created resource in storage.
      */

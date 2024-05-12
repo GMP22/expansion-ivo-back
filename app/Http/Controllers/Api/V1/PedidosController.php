@@ -148,9 +148,38 @@ class PedidosController extends Controller
     }
 
     public function registrarPedidosGestor($idUsuario, Request $request){
+        $articulosAPedir = $request->all();
+        $rdo = usort($articulosAPedir, function($a, $b) {
+            if ($a["id_proveedor"] == $b["id_proveedor"]) {
+                return 0;
+            }
+            return ($a["id_proveedor"] < $b["id_proveedor"]) ? -1 : 1;
+        });
 
-        return response()->json($request, 200);
+        $coleccion = collect($articulosAPedir);
+        $nProveedores = $coleccion->unique('id_proveedor')->values()->all();
+
+        $xd = "Pedidos Procesados exitosamente";
+
+        foreach ($nProveedores as $key => $value) {
+
+            $pedido = new Pedidos();
+            $pedido -> id_usuario_solicitante = $idUsuario;
+            $pedido -> fecha_inicial = date("Y-m-d");
+            $pedido -> estado = "En Transito";
+            $pedido -> es_departamento = false;
+            $pedido -> id_servicio = null;
+            $pedido -> save();
+            //$user->roles()->attach($roleId, ['expires' => $expires]);
+            foreach ($coleccion as $key2 => $value2) {
+                if($value["id_proveedor"] == $value2["id_proveedor"]){
+                    $pedido -> articulos() -> attach($value2["id_articulo"], ["id_proveedor" => intval($value2["id_proveedor"]), "lotes_recibidos" => $value2["nLotes"], "fecha_aceptada" => null]);
+                }
+            }
+        }
+        return response()->json($xd, 200);
     }
+
 
     /**
      * Show the form for creating a new resource.

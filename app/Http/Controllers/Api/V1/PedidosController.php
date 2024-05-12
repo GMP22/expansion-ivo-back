@@ -30,18 +30,17 @@ class PedidosController extends Controller
         $pedido = $user -> pedidos -> where("fecha_aceptada", null);
 
         $pedidosResultantes = [];
-        $nombre_proveedor = null;
         $numero_productos = null;
         foreach ($pedido as $key => $value) {
-            $nombre_proveedor = $value[0];
-            $numero_productos = $value->articulos->count(); 
+            
             $proveedor = Proveedor::find($value->proveedores[0]->id_proveedor);
-            $x = $proveedor -> articulos;
+            $articulos = $value->articulos;
             $costeArticulos = 0;
-                
-                for ($j=0; $j < $numero_productos; $j++) { 
-                    $costeArticulos += $x[$j]->pivot->coste_por_lote * $value->articulos[$j]->pivot->lotes_recibidos;
+
+                foreach ($articulos as $key2 => $value2) {
+                   $costeArticulos += $value2->pivot->lotes_recibidos * $value2->proveedores[0]->pivot->coste_por_lote;
                 }
+            $numero_productos = $value->articulos->count(); 
 
             $p = [
                 'id_pedido' => $value->id_pedido,
@@ -52,6 +51,7 @@ class PedidosController extends Controller
             ];
            
             $pedidosResultantes[] = $p;
+            
         };
         return response()->json($pedidosResultantes);
     }

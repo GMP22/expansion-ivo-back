@@ -32,7 +32,7 @@ class Pedidos extends Model
 
     public function proveedores(){
         //return $this -> belongsToMany(AlmacenGeneral::class, 'articulos_por_pedido', 'id_pedido', 'id_numero_articulo', 'id_proveedor');
-        return $this -> belongsToMany(Proveedor::class, 'articulos_por_pedido', 'id_pedido', 'id_proveedor');
+        return $this -> belongsToMany(Proveedor::class, 'articulos_por_pedido', 'id_pedido', 'id_proveedor') ->withPivot('lotes_recibidos');
     }
 
     public function servicio(){

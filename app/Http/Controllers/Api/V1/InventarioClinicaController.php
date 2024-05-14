@@ -134,6 +134,12 @@ class InventarioClinicaController extends Controller
         return response()->json($p, 200);
     }
 
+    public function functionAutomatica($idUsuario, $id, $request){
+        $articulo = AlmacenGeneral::find($id);
+        $articulo -> articuloConPedidosAutomaticos;
+        return response()->json($p, 200);
+    }
+
     /**
      * Show the form for creating a new resource.
      */

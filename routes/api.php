@@ -105,6 +105,9 @@ Route::group([
     Route::get('detalles-articulos-gestor/{id}', [App\Http\Controllers\Api\V1\InventarioClinicaController::class, 'detallesArticuloGestor']);
     Route::get('pedidos-articulo-especifico-gestor/{id}', [App\Http\Controllers\Api\V1\InventarioClinicaController::class, 'pedidosConArticuloEspecifico']);
     Route::get('detalles-pedido-especifico-gestor/{id}', [App\Http\Controllers\Api\V1\InventarioClinicaController::class, 'detallesPedidoEspecifico']);
+    
+    //Route::get('funcion-automatica/{idUsuario}', [App\Http\Controllers\Api\V1\InventarioClinicaController::class, 'functionAutomatica']);
+
 
     Route::get('articulos-crear-pedido', [App\Http\Controllers\Api\V1\AlmacenGeneralController::class, 'articulosCrearPedido']);
     Route::get('detalles-articulo-crear-pedido/{id}', [App\Http\Controllers\Api\V1\AlmacenGeneralController::class, 'detallesArticulosCrearPedido']);

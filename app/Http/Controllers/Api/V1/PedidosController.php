@@ -7,6 +7,7 @@ use App\Http\Resources\V1\PedidosPendientesResource;
 use App\Models\Pedidos;
 use App\Models\Usuario;
 use App\Models\Proveedor;
+use App\Models\InventarioClinica;
 use Illuminate\Http\Request;
 
 class PedidosController extends Controller
@@ -180,6 +181,34 @@ class PedidosController extends Controller
         return response()->json($xd, 200);
     }
 
+    public function recibirPedidoGestor($idArticulo){
+        $pedido = Pedidos::find($idArticulo);
+        
+        $pedido -> fecha_aceptada = date("Y-m-d");
+        $pedido -> estado = "Recibido";
+        $pedido -> save();
+
+        $articulos = $pedido -> articulos;
+
+        foreach ($articulos as $key => $value) {
+            $articuloClinica = InventarioClinica::where('id_articulo', $value->id_articulo) -> get();
+
+            if ($articuloClinica -> count() == 1) {
+                $articuloClinica[0] -> lotes_disponibles = $articuloClinica[0] -> lotes_disponibles + $value -> pivot -> lotes_recibidos;
+                $articuloClinica[0] -> save();
+            } else {
+                $nuevoArticuloClinica = new InventarioClinica();
+                $nuevoArticuloClinica -> id_articulo = $value -> id_articulo;
+                $nuevoArticuloClinica -> estado = "En Stock";
+                $nuevoArticuloClinica -> lotes_disponibles = $value -> pivot -> lotes_recibidos;
+                $nuevoArticuloClinica -> stock_minimo = 10;
+                $nuevoArticuloClinica -> pedido_automatico = false;
+                $nuevoArticuloClinica -> save();
+            }
+        }
+
+        return response()->json("Pedido exitosamente recibido", 200); 
+    }
 
     /**
      * Show the form for creating a new resource.

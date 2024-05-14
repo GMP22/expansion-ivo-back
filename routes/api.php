@@ -108,6 +108,7 @@ Route::group([
     
     //Route::get('funcion-automatica/{idUsuario}', [App\Http\Controllers\Api\V1\InventarioClinicaController::class, 'functionAutomatica']);
 
+    
 
     Route::get('articulos-crear-pedido', [App\Http\Controllers\Api\V1\AlmacenGeneralController::class, 'articulosCrearPedido']);
     Route::get('detalles-articulo-crear-pedido/{id}', [App\Http\Controllers\Api\V1\AlmacenGeneralController::class, 'detallesArticulosCrearPedido']);
@@ -116,7 +117,7 @@ Route::group([
 
     Route::post('registrar-pedido-gestor/{idArticulo}', [App\Http\Controllers\Api\V1\PedidosController::class,'registrarPedidosGestor']);
     Route::post('recibir-pedido-gestor/{idArticulo}', [App\Http\Controllers\Api\V1\PedidosController::class,'recibirPedidoGestor']);
-
+    Route::post('aceptar-solicitud-gestor/{idArticulo}', [App\Http\Controllers\Api\V1\PedidosController::class,'aceptarSolicitudes']);
 
 });
 

@@ -38,8 +38,4 @@ class Pedidos extends Model
     public function servicio(){
         return $this -> hasOne(Servicio::class, 'id_servicio', 'id_servicio');
     }
-
-    public function lotesAgarradosPorPedido(){
-        return $this -> belongsToMany(Pedidos::class, 'lotes_solicitados', 'id_pedido_proveniente', 'id_pedido_receptor', 'id_articulo', 'id_usuario_solicitante');
-    }
 }

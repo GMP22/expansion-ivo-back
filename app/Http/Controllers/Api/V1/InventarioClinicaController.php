@@ -16,8 +16,7 @@ class InventarioClinicaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
+    public function index(){
         $inventario = InventarioClinica::all();
         $articulosResultantes = [];
             foreach ($inventario as $key => $value) {
@@ -34,6 +33,7 @@ class InventarioClinicaController extends Controller
                     }
                 
                 $a = [
+                    'id_articulo_clinica' => $value -> id_articulo_clinica,
                     'nombre_articulo' => $nombreArticulo,
                     'nombre_categoria' => $categoria,
                     'numero_lotes' => $lotesDisponibles,
@@ -83,12 +83,16 @@ class InventarioClinicaController extends Controller
     }
 
     public function detallesArticuloGestor($id){
-        $articulos = InventarioClinica::where("id_articulo", $id)->get()->first();
-        return response()->json($articulos, 200); 
+        $articulo = collect(InventarioClinica::find($id));
+        
+        $info = AlmacenGeneral::find($articulo["id_articulo"]);
+
+        $articulo -> put('nombre', $info->nombre);
+        return response()->json($articulo, 200); 
     }
 
     public function pedidosConArticuloEspecifico($id){
-        $pedidos=InventarioClinica::find($id)->articulo->pedidos->where("es_departamento", false);
+        $pedidos=InventarioClinica::find($id)->articulo->pedidos->where("es_departamento", false)->where("estado", "Recibido");
         
         $p = [];
         foreach ($pedidos as $key => $value) {
@@ -101,7 +105,6 @@ class InventarioClinicaController extends Controller
                     "lotes_recibidos" => $value -> pivot -> lotes_recibidos,
                 ];
                 $p [] = $x;
-          
         }
         return response()->json($p, 200);
     }
@@ -124,6 +127,7 @@ class InventarioClinicaController extends Controller
             $p = [
                 'id_pedido' => $pedido->id_pedido,
                 'proveedor' => $proveedor->nombre,
+                'estado' => $pedido -> estado,
                 'fecha_inicial' => $pedido->fecha_inicial,
                 'numero_productos' => $numero_productos,
                 'coste' => $costeArticulos, 
@@ -134,11 +138,39 @@ class InventarioClinicaController extends Controller
         return response()->json($p, 200);
     }
 
-    public function functionAutomatica($idUsuario, $id, $request){
-        $articulo = AlmacenGeneral::find($id);
-        $articulo -> articuloConPedidosAutomaticos;
-        return response()->json($p, 200);
+    public function cambiarMinimos($id, Request $request){
+        
+        $articulo = InventarioClinica::find($id);
+        $articulo -> stock_minimo = $request[0];
+
+        if ($articulo -> stock_minimo > $articulo -> lotes_disponibles) {
+            $articulo -> estado = "En Minimos";
+        } else {
+            $articulo -> estado = "En Stock";
+        }
+
+        $articulo -> save();
+        return response()->json($articulo -> estado, 200);
     }
+
+    public function nuevaFunctionAutomatica(Request $request){
+        $articulo = AlmacenGeneral::find($request->id_articulo);
+        $texto = "hola";
+        if ($articulo -> articuloConPedidosAutomaticos->where('id_usuario', $request->id_usuario)->count() == 0) {
+            $articulo -> articuloConPedidosAutomaticos() -> attach($request->id_articulo, ["id_usuario"=>$request->id_usuario, "id_proveedor"=>$request->id_proveedor, "stock_a_pedir"=>$request->cantidad]);
+            $texto = "creado";
+        } else {
+            $articulo -> articuloConPedidosAutomaticos() -> updateExistingPivot($request->id_usuario, ["id_proveedor"=>$request->id_proveedor, "stock_a_pedir"=>$request->cantidad]);
+            $texto = "actualizado";
+        }
+        return response()->json($texto, 200);
+    }
+
+    public function eliminarFuncionAutomatica(Request $request){
+        $articulo = AlmacenGeneral::find($request->id_articulo);
+        $articulo -> articuloConPedidosAutomaticos() -> detach($request->id_usuario);
+        return response()->json("Eliminado exitosamente el pedido automatico", 200);
+    }        
 
     /**
      * Show the form for creating a new resource.

@@ -34,5 +34,5 @@ class InventarioClinica extends Model
 
     public function medicos(){
         return $this->belongsToMany(Medico::class, 'inventario_medico', 'id_usuario_medico', 'id_articulo_departamento');
-    }S
+    }
 }

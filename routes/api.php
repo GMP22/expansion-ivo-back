@@ -86,6 +86,7 @@ Route::group([
     Route::delete('imagen/{id}', [App\Http\Controllers\Api\V1\ImagenController::class, 'eliminarImagen']);
     Route::post('actualizar-prueba/{id}', [App\Http\Controllers\Api\V1\PruebaController::class, 'actualizarPrueba']);
 
+    Route::get('pedido', [App\Http\Controllers\Api\V1\PedidosController::class, 'index']);
     Route::get('pedidos/{id}', [App\Http\Controllers\Api\V1\PedidosController::class, 'mostrarPedidosSegunId']);
     Route::get('pedidos-pendientes-gestor/{id}', [App\Http\Controllers\Api\V1\PedidosController::class, 'pedidosPendientesGestor']);
     Route::get('pedidos-recibidos-gestor/{id}', [App\Http\Controllers\Api\V1\PedidosController::class, 'pedidosRecibidosGestor']);
@@ -106,19 +107,17 @@ Route::group([
     Route::get('pedidos-articulo-especifico-gestor/{id}', [App\Http\Controllers\Api\V1\InventarioClinicaController::class, 'pedidosConArticuloEspecifico']);
     Route::get('detalles-pedido-especifico-gestor/{id}', [App\Http\Controllers\Api\V1\InventarioClinicaController::class, 'detallesPedidoEspecifico']);
     
-    //Route::get('funcion-automatica/{idUsuario}', [App\Http\Controllers\Api\V1\InventarioClinicaController::class, 'functionAutomatica']);
-
+    Route::post('nueva-funcion-automatica', [App\Http\Controllers\Api\V1\InventarioClinicaController::class, 'nuevaFunctionAutomatica']);
+    Route::post('eliminar-funcion-automatica', [App\Http\Controllers\Api\V1\InventarioClinicaController::class, 'eliminarFuncionAutomatica']);
     
-
+    Route::post('cambiar-minimo-gestor/{id}', [App\Http\Controllers\Api\V1\InventarioClinicaController::class, 'cambiarMinimos']);
     Route::get('articulos-crear-pedido', [App\Http\Controllers\Api\V1\AlmacenGeneralController::class, 'articulosCrearPedido']);
     Route::get('detalles-articulo-crear-pedido/{id}', [App\Http\Controllers\Api\V1\AlmacenGeneralController::class, 'detallesArticulosCrearPedido']);
     Route::get('detalles-articulo-segun-proveedor/{idArticulo}/{idProveedor}', [App\Http\Controllers\Api\V1\AlmacenGeneralController::class, 'detallesArticulosSegunProveedor']);
     Route::get('articulo-segun-proveedor/{idArticulo}', [App\Http\Controllers\Api\V1\AlmacenGeneralController::class, 'proveedoresSegunArticulo']);
-
     Route::post('registrar-pedido-gestor/{idArticulo}', [App\Http\Controllers\Api\V1\PedidosController::class,'registrarPedidosGestor']);
-    Route::post('recibir-pedido-gestor/{idArticulo}', [App\Http\Controllers\Api\V1\PedidosController::class,'recibirPedidoGestor']);
+    Route::get('recibir-pedido-gestor/{idArticulo}', [App\Http\Controllers\Api\V1\PedidosController::class,'recibirPedidoGestor']);
     Route::post('aceptar-solicitud-gestor/{idArticulo}', [App\Http\Controllers\Api\V1\PedidosController::class,'aceptarSolicitudes']);
-
 });
 
 Route::apiResource('v1/pacientes', App\Http\Controllers\Api\V1\PacienteController::class);

@@ -35,10 +35,6 @@ class AlmacenGeneral extends Model
     }
 
     public function articuloConPedidosAutomaticos(){
-        return $this -> belongsToMany(AlmacenGeneral::class, 'articulos_automatizado', 'id_articulo', 'id_usuario');
-    }
-
-    public function lotesAgarradosDeArticulo(){
-        return $this -> belongsToMany(AlmacenGeneral::class, 'lotes_solicitados', 'id_pedido_proveniente', 'id_pedido_receptor', 'id_articulo', 'id_usuario_solicitante');
+        return $this -> belongsToMany(Usuario::class, 'pedidos_automatizados', 'id_articulo', 'id_usuario')->withPivot('id_proveedor', 'stock_a_pedir');
     }
 }

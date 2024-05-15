@@ -17,7 +17,7 @@ class PedidosController extends Controller
      */
     public function index()
     {
-        return 1;
+        return response()->json(Pedidos::find(3));
     }
     
     public function mostrarPedidosSegunId($id){
@@ -195,6 +195,11 @@ class PedidosController extends Controller
 
             if ($articuloClinica -> count() == 1) {
                 $articuloClinica[0] -> lotes_disponibles = $articuloClinica[0] -> lotes_disponibles + $value -> pivot -> lotes_recibidos;
+
+                if($articuloClinica[0] -> lotes_disponibles > $articuloClinica[0] -> stock_minimo){
+                    $articuloClinica[0] -> estado = "En Stock";
+                }
+
                 $articuloClinica[0] -> save();
             } else {
                 $nuevoArticuloClinica = new InventarioClinica();

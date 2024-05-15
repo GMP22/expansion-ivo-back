@@ -29,7 +29,7 @@ class InventarioClinica extends Model
     }
 
     public function inventarioDepartamentos(){
-        return $this->belongsToMany(Servicio::class, 'inventario_departamentos', 'id_articulo_clinica', 'id_departamento')->withPivot('estado','lotes_disponibles','stock_minimo','pedido_automatico');
+        return $this->belongsToMany(Servicio::class, 'inventario_departamentos', 'id_departamento', 'id_articulo_clinica')->withPivot('estado','lotes_disponibles','stock_minimo','pedido_automatico');
     }
 
     public function medicos(){

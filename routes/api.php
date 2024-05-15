@@ -96,6 +96,10 @@ Route::group([
 
     Route::get('solicitudes-entrantes-gestor/{id}', [App\Http\Controllers\Api\V1\PedidosController::class, 'solicitudesEntrantesGestor']);
     Route::get('solicitudes-aceptados-gestor/{id}', [App\Http\Controllers\Api\V1\PedidosController::class, 'solicitudesAceptadasGestor']);
+    
+    Route::get('detalles-solicitudes-gestor/{id}', [App\Http\Controllers\Api\V1\PedidosController::class, 'detallesSolicitudGestor']);
+    Route::get('articulos-solicitudes-gestor/{id}', [App\Http\Controllers\Api\V1\PedidosController::class, 'articulosSolicitud']);
+
     Route::get('detalles-pedido-gestor/{id}', [App\Http\Controllers\Api\V1\PedidosController::class, 'detallesPedido']);
    
     Route::get('inventario-gestor', [App\Http\Controllers\Api\V1\InventarioClinicaController::class, 'index']);
@@ -117,7 +121,7 @@ Route::group([
     Route::get('articulo-segun-proveedor/{idArticulo}', [App\Http\Controllers\Api\V1\AlmacenGeneralController::class, 'proveedoresSegunArticulo']);
     Route::post('registrar-pedido-gestor/{idArticulo}', [App\Http\Controllers\Api\V1\PedidosController::class,'registrarPedidosGestor']);
     Route::get('recibir-pedido-gestor/{idArticulo}', [App\Http\Controllers\Api\V1\PedidosController::class,'recibirPedidoGestor']);
-    Route::post('aceptar-solicitud-gestor/{idArticulo}', [App\Http\Controllers\Api\V1\PedidosController::class,'aceptarSolicitudes']);
+    Route::post('aceptar-solicitud-gestor/{idUsuario}/{idPedido}', [App\Http\Controllers\Api\V1\PedidosController::class,'aceptarSolicitudes']);
 });
 
 Route::apiResource('v1/pacientes', App\Http\Controllers\Api\V1\PacienteController::class);

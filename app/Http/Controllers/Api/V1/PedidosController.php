@@ -112,6 +112,39 @@ class PedidosController extends Controller
         
     }
 
+    public function detallesSolicitudGestor($id){
+        $pedido = Pedidos::find($id);
+        $numero_productos = $pedido->articulos->count();
+        $usuario = $pedido->usuario->nombre." ".$pedido->usuario->apellido1;
+        $fecha_inicial = $pedido->fecha_inicial;
+        $fecha_aceptada = $pedido->fecha_aceptada;
+
+        $rdo = [
+            'solicitud' => $pedido->id_pedido,
+            'nombre_departamento' => $pedido->servicio->nombre_servicio,
+            'nombre_jefe' => $usuario,
+            'numero_productos' => $numero_productos,
+            'fecha_inicial' => $fecha_inicial,
+            'fecha_aceptada' => $fecha_aceptada,
+        ];
+      
+        return response()->json($rdo, 200); 
+    }
+
+    public function articulosSolicitud($idPedido){
+        $pedido = Pedidos::find($idPedido);
+        $rdo = [];
+        foreach ($pedido->articulos as $key => $value) {
+            $p = [
+                'nombre' => $value -> nombre,
+                'cantidad' => $value -> pivot -> lotes_recibidos,
+            ];
+            
+            $rdo [] = $p;
+        }
+        return response()->json($rdo, 200);
+    }
+
     public function solicitudesEntrantesGestor($id){
         $pedidos = Pedidos::where([['es_departamento', '=', true], ['estado', '=', "Pendiente"]])->get();
         $pedidosResultantes = [];
@@ -215,33 +248,38 @@ class PedidosController extends Controller
         return response()->json("Pedido exitosamente recibido", 200); 
     }
 
-    public function aceptarSolicitudes($idUsuarioAprobante, $id,Request $request){
-        $solicitud = Pedidos::find($id);
+    public function aceptarSolicitudes($idUsuario, $idPedido, Request $request){
+
+        $articulosMinimos = $request->all();
+
+        $solicitud = Pedidos::find($idPedido);
 
         $solicitud -> fecha_aceptada = date("Y-m-d");
         $solicitud -> estado = "Aceptada";
-        $solicitud -> save();
+        //$solicitud -> save();
         
         $articulosDeSolicitud = $solicitud -> articulos;
 
         foreach ($articulosDeSolicitud as $key => $value) {
-            $articuloDepartamento = InventarioClinica::where('id_articulo', $value->id_articulo)->first()->inventarioDepartamentos->where("id_servicio", $solicitud -> id_servicio);
+            $articuloDepartamento = InventarioClinica::where('id_articulo', $value->id_articulo)->first()->inventarioDepartamentos->where("id_departamento", $solicitud -> id_servicio);
             $minimos = false;
             $cantidadAQuitar=0;
 
             if ($articuloDepartamento->count() == 0) {
                 $artDepSeleccionado = InventarioClinica::where('id_articulo', $value->id_articulo)->first();
 
+                if (count($articulosMinimos) > 1) {
                 foreach ($request as $key2 => $value2) {
                     if ($value2[0] == $value -> id_articulo) {
                         $cantidadAQuitar = $value2[1];
                         $minimos = true;
-                    } 
+                        } 
+                    }
                 }
 
                 if($minimos == true){
                     $artDepSeleccionado->lotes_disponibles= $artDepSeleccionado->lotes_disponibles - $cantidadAQuitar;
-                    $artDepSeleccionado->inventarioDepartamentos()->attach($value->id_servicio, ['estado'=>"En Stock", "lotes_disponibles"=>$cantidadAQuitar, "stock_minimo" => 10, "pedido_automatico"=>false]);
+                    $artDepSeleccionado->inventarioDepartamentos()->attach($artDepSeleccionado->id_articulo_clinica, ['estado'=>"En Stock", "lotes_disponibles"=>$cantidadAQuitar, "stock_minimo" => 10, "pedido_automatico"=>false]);
                     $artDepSeleccionado->save();
                 }else if($minimos == false){
                     $artDepSeleccionado->lotes_disponibles= $artDepSeleccionado->lotes_disponibles - $value -> lotes_recibidos;
@@ -261,20 +299,23 @@ class PedidosController extends Controller
                         
                     } else if($artDepSeleccionado -> estado == "En Stock" && $artDepSeleccionado->lotes_disponibles < $artDepSeleccionado->stock_minimo) {
                         $artDepSeleccionado->estado = "En Minimos";
-                        $artDepSeleccionado->inventarioDepartamentos()->attach($value->id_servicio, ['estado'=>"En Stock", "lotes_disponibles"=>$cantidadAQuitar, "stock_minimo" => 10, "pedido_automatico"=>false]);
+                        $artDepSeleccionado->inventarioDepartamentos()->attach($artDepSeleccionado->id_articulo_clinica, ['estado'=>"En Stock", "lotes_disponibles"=>$cantidadAQuitar, "stock_minimo" => 10, "pedido_automatico"=>false]);
                     } else {
-                        $artDepSeleccionado->inventarioDepartamentos()->attach($value->id_servicio, ['estado'=>"En Stock", "lotes_disponibles"=>$cantidadAQuitar, "stock_minimo" => 10, "pedido_automatico"=>false]);
+                        $artDepSeleccionado->inventarioDepartamentos()->attach($artDepSeleccionado->id_articulo_clinica, ['id_departamento'=>$solicitud->id_servicio, 'estado'=>"En Stock", "lotes_disponibles"=>$value->pivot->lotes_recibidos, "stock_minimo" => 10, "pedido_automatico"=>false]);
                     }
                 }
+                $artDepSeleccionado->save();
             } else {
 
                 $artDepSeleccionado = InventarioClinica::where('id_articulo', $value->id_articulo)->first();
 
-                foreach ($request as $key2 => $value2) {
-                    if ($value2[0] == $value -> id_articulo) {
-                        $cantidadAQuitar = $value2[1];
-                        $minimos = true;
-                    } 
+                if (count($articulosMinimos) > 1) {
+                    foreach ($request as $key2 => $value2) {
+                        if ($value2[0] == $value -> id_articulo) {
+                            $cantidadAQuitar = $value2[1];
+                            $minimos = true;
+                        } 
+                    }
                 }
                 
                 if($minimos == true){
@@ -299,13 +340,15 @@ class PedidosController extends Controller
                         
                     } else if($artDepSeleccionado -> estado == "En Stock" && $artDepSeleccionado->lotes_disponibles < $artDepSeleccionado->stock_minimo) {
                         $artDepSeleccionado->estado = "En Minimos";
-                        $cantidadActualDeArticuloSeleccionado = $artDepSeleccionado->inventarioDepartamentos()->pivot->lotes_disponibles;
+                        $cantidadActualDeArticuloSeleccionado = $artDepSeleccionado->inventarioDepartamentos->pivot->lotes_disponibles;
                         $artDepSeleccionado->inventarioDepartamentos()->updateExistingPivot($value->id_servicio, ['estado'=>"En Stock", "lotes_disponibles"=>$cantidadActualDeArticuloSeleccionado + $value -> lotes_recibidos]);
                     } else {
-                        $cantidadActualDeArticuloSeleccionado = $artDepSeleccionado->inventarioDepartamentos()->pivot->lotes_disponibles;
+                        $cantidadActualDeArticuloSeleccionado = $artDepSeleccionado->inventarioDepartamentos->first()->pivot->lotes_disponibles;
                         $artDepSeleccionado->inventarioDepartamentos()->updateExistingPivot($value->id_servicio, ['estado'=>"En Stock", "lotes_disponibles"=>$cantidadActualDeArticuloSeleccionado + $value -> lotes_recibidos]);
+                        return response()->json($artDepSeleccionado->inventarioDepartamentos, 200); 
                     }
                 }
+                $artDepSeleccionado->save();
             }
         }
 

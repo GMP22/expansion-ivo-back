@@ -172,6 +172,25 @@ class InventarioClinicaController extends Controller
         return response()->json("Eliminado exitosamente el pedido automatico", 200);
     }        
 
+    public function articulosMinimosSolicitud($idPedido){
+        $pedido = Pedidos::find($idPedido);
+        $articulos = $pedido -> articulos;
+        $rdo = [];
+        foreach ($articulos as $key => $value) {
+            $articuloClinica = InventarioClinica::where("id_articulo", $value->id_articulo)->first();
+
+            if ($articuloClinica->estado == "En Minimos" || $value -> lotes_recibidos > $articuloClinica->lotes_disponibles) {
+                $p = [
+                    "id_articulo" => $value->id_articulo,
+                    "nombre_articulo" => $value->nombre,
+                    "lotes_disponibles" => $articuloClinica->lotes_disponibles,
+                ];
+                $rdo [] = $p;
+            }
+        }
+        return response()->json($rdo, 200);
+    }
+
     /**
      * Show the form for creating a new resource.
      */

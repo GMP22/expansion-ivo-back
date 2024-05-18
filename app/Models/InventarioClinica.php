@@ -25,11 +25,11 @@ class InventarioClinica extends Model
     }
 
     public function articuloConPedidosAutomaticos(){
-        return $this -> belongsToMany(AlmacenGeneral::class, 'articulos_automatizado', 'id_articulo', 'id_usuario')->withPivot('id_proveedor','stock_a_pedir');
+        return $this -> belongsToMany(AlmacenGeneral::class, 'pedidos_automatizados', 'id_articulo', 'id_usuario')->withPivot('id_proveedor','stock_a_pedir');
     }
 
     public function inventarioDepartamentos(){
-        return $this->belongsToMany(Servicio::class, 'inventario_departamentos', 'id_departamento', 'id_articulo_clinica')->withPivot('estado','lotes_disponibles','stock_minimo','pedido_automatico');
+        return $this->belongsToMany(Servicio::class, 'inventario_departamentos', 'id_articulo_clinica', 'id_departamento')->withPivot('estado','lotes_disponibles','stock_minimo','pedido_automatico');
     }
 
     public function medicos(){

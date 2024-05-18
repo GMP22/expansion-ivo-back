@@ -100,6 +100,8 @@ Route::group([
     Route::get('detalles-solicitudes-gestor/{id}', [App\Http\Controllers\Api\V1\PedidosController::class, 'detallesSolicitudGestor']);
     Route::get('articulos-solicitudes-gestor/{id}', [App\Http\Controllers\Api\V1\PedidosController::class, 'articulosSolicitud']);
 
+    Route::get('articulos-minimos-solicitud-gestor/{id}', [App\Http\Controllers\Api\V1\InventarioClinicaController::class, 'articulosMinimosSolicitud']);
+
     Route::get('detalles-pedido-gestor/{id}', [App\Http\Controllers\Api\V1\PedidosController::class, 'detallesPedido']);
    
     Route::get('inventario-gestor', [App\Http\Controllers\Api\V1\InventarioClinicaController::class, 'index']);

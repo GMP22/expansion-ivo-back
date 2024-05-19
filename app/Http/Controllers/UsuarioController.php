@@ -34,9 +34,19 @@ class UsuarioController extends Controller
             'correo' => $request->input('email'),
             'password' => $request->input('password')
         ];
-        //dd($credentials);
+        //dd($credentials); 
         if (Auth::guard('usuario')->attempt($credentials)) {
-            return redirect()->route('gestor.usuario');
+
+            $user = Usuario::where("correo", $request['email'])->first();
+            //dd($user);
+            
+            if ($user -> id_rol == 1) {
+                return redirect()->route('gestor.usuario');
+            } else if($user -> esJefe == 1){
+                return redirect()->route('solicitudes');
+            }
+
+            
         }else {
             return redirect()->back()->with('error', 'La dirección de correo electrónico o la contraseña no son correctos. Verifica tus datos e inténtalo otra vez.')->withInput();
         }

@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\GestorController;
+use App\Http\Controllers\JefeDepartamentoController;
 use App\Http\Controllers\ServicioController;
 use App\Http\Controllers\RolController;
 
@@ -60,6 +61,12 @@ Route::group(['middleware' => 'gestor'], function(){
     Route::post('/rol/{id}/editar/modificar', [RolController::class, 'update'])->name('rol.modificar');
     Route::get('/rol/{id}/editar', [RolController::class, 'edit'])->name('rol.edit');
 
+});
+
+Route::group(['middleware' => 'jefe'], function(){
+    Route::get('/solicitudes', [JefeDepartamentoController::class, 'plantilla'])->name('solicitudes');
+    Route::get('/pedidos', [JefeDepartamentoController::class, 'pedidos'])->name('pedidos');
+    Route::get('/inventario', [JefeDepartamentoController::class, 'inventario'])->name('inventario');
 });
 
 

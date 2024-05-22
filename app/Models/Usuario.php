@@ -81,6 +81,11 @@ class Usuario extends Authenticatable implements JWTSubject
         return $this->hasMany(Pedidos::class, 'id_usuario_solicitante', 'id_usuario');
     }
 
+    public function servicio()
+    {
+        return $this->hasOne(Servicio::class, 'jefe_departamento', 'id_usuario');
+    }
+
     public function usuarioConPedidosAutomaticos(){
         return $this -> belongsToMany(Usuario::class, 'articulos_automatizado', 'id_articulo', 'id_usuario', 'id_proveedor');
     }

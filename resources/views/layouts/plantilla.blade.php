@@ -57,7 +57,7 @@
                             </a>
                         </li>
                         <li class="nav-item mt-3">
-                            <a class="nav-link" href="/pedidos">
+                            <a class="nav-link" href="/pedidos/{{Auth::guard('usuario')->user()->servicio->id_servicio}}">
                                 <i class="fa-solid fa-user mx-2"></i>
                                 Pedidos
                             </a>

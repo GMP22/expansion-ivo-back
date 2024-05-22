@@ -65,7 +65,9 @@ Route::group(['middleware' => 'gestor'], function(){
 
 Route::group(['middleware' => 'jefe'], function(){
     Route::get('/solicitudes', [JefeDepartamentoController::class, 'plantilla'])->name('solicitudes');
-    Route::get('/pedidos', [JefeDepartamentoController::class, 'pedidos'])->name('pedidos');
+    Route::get('/pedidos/{id}', [JefeDepartamentoController::class, 'pedidos'])->name('pedidos');
+    Route::get('/pedidos/{id}/crear-pedido', [JefeDepartamentoController::class, 'crearPedidos'])->name('pedidos.crear');
+    Route::post('/pedidos/subir-pedido/{id}', [JefeDepartamentoController::class, 'subirPedido'])->name('pedidos.subir');
     Route::get('/inventario', [JefeDepartamentoController::class, 'inventario'])->name('inventario');
 });
 

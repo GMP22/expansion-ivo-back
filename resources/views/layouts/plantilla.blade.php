@@ -51,7 +51,7 @@
                 <div class="col-12 p-0 d-flex flex-column align-items-center">
                     <ul class="nav navbar-nav">
                         <li class="nav-item mt-3">
-                            <a class="nav-link" href="/solicitudes">
+                            <a class="nav-link" href="/solicitudes/{{Auth::guard('usuario')->user()->servicio->id_servicio}}">
                                 <i class="fa-solid fa-user mx-2"></i>
                                 Solicitudes
                             </a>
@@ -63,7 +63,7 @@
                             </a>
                         </li>
                         <li class="nav-item mt-3">
-                            <a class="nav-link" href="/inventario">
+                            <a class="nav-link" href="/inventario/{{Auth::guard('usuario')->user()->servicio->id_servicio}}">
                                 <i class="fa-solid fa-user mx-2"></i>
                                 Inventario
                             </a>

@@ -43,7 +43,7 @@ class UsuarioController extends Controller
             if ($user -> id_rol == 1) {
                 return redirect()->route('gestor.usuario');
             } else if($user -> esJefe == 1){
-                return redirect()->route('solicitudes');
+                return redirect()->route('solicitudes', Auth::guard("usuario")->user()->servicio->id_servicio);
             }
 
             

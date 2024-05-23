@@ -50,7 +50,30 @@
 
             <div class="row mt-2">
                 <div class="col-12 px-5">
-                        Tabla
+                <table class="table table-hover" id="pedidos-pendientes-table">
+                        <thead>
+                            <tr>
+                                    <td>nombre</td>
+                                    <td>categoria</td>
+                                    <td>lotes_disponibles</td>
+                                    <td>estado</td>
+                                    <td>ultima_fecha_recibida</td>
+                                    <td>Acciones</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($articulosEnDepartamento as $articulo)
+                            <tr>
+                                <td>{{$articulo['nombre']}}</td>
+                                <td>{{$articulo['categoria']}}</td>
+                                <td>{{$articulo['lotes_disponibles']}}</td>
+                                <td>{{$articulo['estado']}}</td>
+                                <td>{{$articulo['ultima_fecha_recibida']}}</td>
+                                <td><button type="button"><a href="/inventario/{{Auth::guard('usuario')->user()->servicio->id_servicio}}/{{$articulo['id_articulo']}}">Añadir</a></button></td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

@@ -86,7 +86,7 @@
                                 <td>{{$pedido['id_pedido']}}</td>
                                 <td>{{$pedido['numero_productos']}}</td>
                                 <td>{{$pedido['fecha_inicial']}}</td>
-                                <td><button class="meter" type="button" data-bs-toggle="modal" data-bs-target="primero">Añadir</button></td>
+                                <td><button class="meter" type="button"><a href="/pedidos/{{Auth::guard('usuario')->user()->servicio->id_servicio}}/{{$pedido['id_pedido']}}">Ver Detalles</a></button></td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -112,7 +112,7 @@
                                     <td>{{$pedido['numero_productos']}}</td>
                                     <td>{{$pedido['fecha_inicial']}}</td>
                                     <td>{{$pedido['fecha_aceptada']}}</td>
-                                    <td><button class="meter" type="button" data-bs-toggle="modal" data-bs-target="primero">Añadir</button></td>
+                                    <td><button class="meter" type="button"><a href="/pedidos/{{Auth::guard('usuario')->user()->servicio->id_servicio}}/{{$pedido['id_pedido']}}">Ver Detalles</a></button></td>
                                 </tr>
                                 @endforeach
                             </tbody>

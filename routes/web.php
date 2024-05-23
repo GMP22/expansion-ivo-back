@@ -64,11 +64,17 @@ Route::group(['middleware' => 'gestor'], function(){
 });
 
 Route::group(['middleware' => 'jefe'], function(){
-    Route::get('/solicitudes', [JefeDepartamentoController::class, 'plantilla'])->name('solicitudes');
+    Route::get('/solicitudes/{id}', [JefeDepartamentoController::class, 'plantilla'])->name('solicitudes');
+    Route::get('/solicitudes/{id}', [JefeDepartamentoController::class, 'solicitudes'])->name('solicitudes');
+    Route::get('/solicitudes/{id}/{idSolicitud}/comprobar-minimos', [JefeDepartamentoController::class, 'verificarMinimosArticulos'])->name('solicitudes.minimos');
     Route::get('/pedidos/{id}', [JefeDepartamentoController::class, 'pedidos'])->name('pedidos');
     Route::get('/pedidos/{id}/crear-pedido', [JefeDepartamentoController::class, 'crearPedidos'])->name('pedidos.crear');
+    Route::get('/pedidos/{id}/{idPedido}', [JefeDepartamentoController::class, 'detallesPedido'])->name('pedidos.detalles');
     Route::post('/pedidos/subir-pedido/{id}', [JefeDepartamentoController::class, 'subirPedido'])->name('pedidos.subir');
-    Route::get('/inventario', [JefeDepartamentoController::class, 'inventario'])->name('inventario');
+    Route::get('/inventario/{id}', [JefeDepartamentoController::class, 'inventario'])->name('inventario');
+    Route::get('/inventario/{id}/{idArticulo}', [JefeDepartamentoController::class, 'detalleArticulo'])->name('inventario.detalles');
+    Route::post('/inventario/{id}/{idArticulo}/cambiar-minimo', [JefeDepartamentoController::class, 'cambiarMinimos'])->name('inventario.cminimo');
+    Route::post('/inventario/{id}/{idArticulo}/pedido-automatico', [JefeDepartamentoController::class, 'funcionAutomatica'])->name('inventario.cAuto');
 });
 
 

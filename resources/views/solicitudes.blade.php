@@ -44,7 +44,7 @@
                                     <td>{{$pedido['nombre_usuario']}}</td>
                                     <td>{{$pedido['numero_productos']}}</td>
                                     <td>{{$pedido['fecha_inicial']}}</td>
-                                    <td><button type="button"><a href="/pedidos/{{Auth::guard('usuario')->user()->servicio->id_servicio}}/{{$pedido['id_pedido']}}">Ver Detalles</a></button> <button type="button"><a href="/solicitudes/{{Auth::guard('usuario')->user()->servicio->id_servicio}}/{{$pedido['id_pedido']}}/comprobar-minimos">Aceptar Solicitud</a></button></td>
+                                    <td><button type="button"><a href="/pedidos/{{Auth::guard('usuario')->user()->servicio->id_servicio}}/{{$pedido['id_pedido']}}">Ver Detalles</a></button> <button type="button" onclick="mirar()">Aceptar Solicitud</button></td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -91,6 +91,21 @@
         <div class="modal-header">
           <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
         </div>
+
+            <table class="table table-hover" id="minimos-table">
+                <thead>
+                    <th>Nombre</th>
+                    <th>Cantidad</th>
+                </thead>
+                <tbody>
+                <!--- <tr id='id_articulo'>--->
+                    <!---<td> Nombre </td>--->
+                    <!---<td class='cantidad'> Cantidad </td>--->
+                <!---</tr>--->
+                </tbody>
+            </table>
+
+
             <div>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Cambiar Minimo</button>
@@ -100,12 +115,21 @@
 </div>
             
 
-    <script type="text/javascript">
-
-    /*
+<script type="text/javascript">
+    function mirar(){
         var modal1 = new bootstrap.Modal(document.getElementById('cambiarMinimos'));
-        modal1.toggle();
-    */
+        $.ajax({
+        url: "/solicitudes/{{Auth::guard('usuario')->user()->servicio->id_servicio}}/{{$pedido['id_pedido']}}/comprobar-minimos",
+        type: 'GET',
+        dataType: "json",
+        success: function(data) {
+            if (data.length) {
+                
+                modal1.toggle();
+            }
+        }
+    });
+    }
 
     var dtOptions = {
             language: {
@@ -117,6 +141,7 @@
         };
         new DataTable('#pedidos-pendientes-table', dtOptions);
         new DataTable('#pedidos-aceptados-table', dtOptions);
+        new DataTable('#minimos-table', dtOptions);
         $('#realizada').hide();
        
 

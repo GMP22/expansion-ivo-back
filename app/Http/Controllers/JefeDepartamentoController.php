@@ -72,7 +72,7 @@ class JefeDepartamentoController extends Controller
         }
     }
     
-    return redirect()->route('solicitudes', $idServicio)->with('minimos2');
+    return response()->json($minimos, 200);
 }
 
     /*

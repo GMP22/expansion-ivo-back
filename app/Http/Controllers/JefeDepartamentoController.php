@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\InventarioClinica;
 use App\Models\Usuario;
 use App\Models\Pedidos;
+use App\Models\Servicio;
 use App\Models\AlmacenGeneral;
 class JefeDepartamentoController extends Controller
 {
@@ -60,31 +61,32 @@ class JefeDepartamentoController extends Controller
         $articuloClinica = InventarioClinica::where("id_articulo", $value->id_articulo) -> first() -> inventarioDepartamentos -> where("id_servicio", $idServicio)->first();
 
         if ($articuloClinica != null) {
-            if ($articuloClinica->pivot->estado == "En Minimos" || $value -> lotes_recibidos > $articuloClinica->pivot->lotes_disponibles) {
-            $p = [
-                "id_articulo" => $value->id_articulo,
-                "nombre_articulo" => $value->nombre,
-                "lotes_disponibles" => $articuloClinica->pivot->lotes_disponibles,
-            ];
-            $minimos [] = $p;
+            if ($articuloClinica->pivot->estado == "En Minimos" || $value -> pivot -> lotes_recibidos > $articuloClinica->pivot->lotes_disponibles) {
+                $xd = 0;
+                
+                if ($value -> pivot -> lotes_recibidos >= $articuloClinica->pivot->lotes_disponibles) {
+                    $xd = $articuloClinica->pivot->lotes_disponibles;
+                } else if ($value -> pivot -> lotes_recibidos <= $articuloClinica->pivot->lotes_disponibles){
+                    $xd = $value["pivot"]->lotes_recibidos;
+                }
+
+                $p = [
+                    "id_articulo" => $value->id_articulo,
+                    "nombre_articulo" => $value->nombre,
+                    "lotes_disponibles" => $xd,
+                ];
+                $minimos [] = $p;
             $cantidad++;
+                }
             }
         }
-    }
-    
+        $minimos [] = $idPedido;
     return response()->json($minimos, 200);
-}
-
-    /*
-        $tipo_usuario = $request->input('tipo_usuario', 'Médico'); 
-        $rol = Rol::where('nombre', $tipo_usuario)->first();
-        $usuarios = Usuario::where('id_rol', $rol->id_rol)->get();
-        return view('usuario.gestor.dashboard', compact('usuarios', 'tipo_usuario'));
-    */
+    }
 
     public function pedidos($id_servicio){   
-        $pedidosPendientes = Pedidos::where("estado", "Pendiente")->where("id_servicio", $id_servicio)->get();
-        $pedidosAceptados = Pedidos::where("estado", "Aceptada")->where("id_servicio", $id_servicio)->get();
+        $pedidosPendientes = Pedidos::where("estado", "Pendiente")->where("id_servicio", $id_servicio)->where("es_departamento", true)->get();
+        $pedidosAceptados = Pedidos::where("estado", "Aceptada")->where("id_servicio", $id_servicio)->where("es_departamento", true)->get();
         $rdo1 = []; 
         $rdo2 = [];
 
@@ -217,7 +219,7 @@ class JefeDepartamentoController extends Controller
 		if ($lotes_disponibles > $stock_minimo) {
             InventarioClinica::find($idArticulo)->inventarioDepartamentos()->updateExistingPivot($idServicio, ["estado"=>"En Stock"]);
         } else {
-            InventarioClinica::find($idArticulo)->inventarioDepartamentos()->updateExistingPivot($idServicio, ["estado"=>"En Minimo"]);
+            InventarioClinica::find($idArticulo)->inventarioDepartamentos()->updateExistingPivot($idServicio, ["estado"=>"En Minimos"]);
         }
 		return redirect()->route('inventario.detalles', [$idServicio, $idArticulo]);
     }
@@ -245,8 +247,7 @@ class JefeDepartamentoController extends Controller
         return redirect()->route('inventario.detalles', [$idServicio, $idArticulo]);
     }
 
-    public function subirPedido($idUsuario,Request $request)
-    {
+    public function subirPedido($idUsuario,Request $request){
         $a = $request->all();
 
         $rdo = [];
@@ -268,7 +269,7 @@ class JefeDepartamentoController extends Controller
         
         $id_servicio = Usuario::find($idUsuario) -> servicio -> id_servicio;
         
-        $pedido = new Pedidos();
+            $pedido = new Pedidos();
             $pedido -> id_usuario_solicitante = $idUsuario;
             $pedido -> fecha_inicial = date("Y-m-d");
             $pedido -> estado = "Pendiente";
@@ -281,6 +282,87 @@ class JefeDepartamentoController extends Controller
         }
 
         return $id_servicio;
+    }
+
+    public function aceptarSolicitud($idServicio, $idSolicitud, Request $request){
+
+        $a = $request->all();
+
+        $rdo = [];
+
+        foreach ($a as $key => $value) {
+
+            $id = intval($key);
+            $cantidad = intval($value);
+
+            if ($key != "_method" && $key != "_token") {
+                $p = [
+                    "id_articulo" => $id,
+                    "lotes_disponibles" => $cantidad,
+                ];
+
+                $rdo [] = $p;
+            }
+        }
+
+        $coleccionArticulosMinimos = collect($rdo);
+        
+        $solicitud = Pedidos::find($idSolicitud);
+        
+        $solicitud -> fecha_aceptada = date("Y-m-d");
+        $solicitud -> estado = "Aceptada";
+        $solicitud -> save(); 
+        
+        $articulosDeSolicitud = $solicitud -> articulos;
+         
+        foreach($articulosDeSolicitud as $key => $value){
+             
+           $existeArticuloEnDepartamento = InventarioClinica::where('id_articulo', $value->id_articulo)->first()->inventarioMedicos->where("id_usuario_medico", $solicitud->id_usuario_solicitante)->count();
+
+           $artDepSeleccionado = InventarioClinica::where('id_articulo', $value->id_articulo)->first()->inventarioDepartamentos->where("id_servicio", $idServicio)->first();
+            
+           $cantidadAQuitar=$value->pivot->lotes_recibidos; 
+           $articuloEnMinimo=false; 
+
+            if (count($rdo) >= 1) {
+               foreach ($coleccionArticulosMinimos as $key2 => $value2) {
+                   if ($value2["id_articulo"] == $value -> id_articulo) {
+                       $cantidadAQuitar = $value2["lotes_disponibles"];
+                       $articuloEnMinimo = true;
+                     } 
+                }
+            }
+          
+            InventarioClinica::where('id_articulo', $value->id_articulo)->first()->inventarioDepartamentos()->updateExistingPivot($solicitud->id_servicio, ["lotes_disponibles"=>$artDepSeleccionado->pivot->lotes_disponibles - $cantidadAQuitar]);
+
+                if($existeArticuloEnDepartamento == 0){
+                    InventarioClinica::where('id_articulo', $value->id_articulo)->first()->inventarioMedicos()->attach($solicitud -> id_usuario_solicitante, ['id_articulo_departamento'=> $artDepSeleccionado -> pivot -> id_articulo_clinica, 'estado'=>"En Stock", "lotes_disponibles"=>$cantidadAQuitar, "stock_minimo" => 10, "pedido_automatico"=>false]);
+                } else {
+                    $artMedSeleccionado = InventarioClinica::where('id_articulo', $value->id_articulo)->first();
+                    $stockEnDepartamento = $artMedSeleccionado->inventarioMedicos->where("id_usuario_medico", $solicitud->id_usuario_solicitante)->first()->pivot->lotes_disponibles;
+                    $artMedSeleccionado->inventarioMedicos()->updateExistingPivot($solicitud -> id_usuario_solicitante, ['estado'=>"En Stock", "lotes_disponibles"=>$stockEnDepartamento + $cantidadAQuitar]);
+                }
+
+                if($articuloEnMinimo == false){
+                       if($artDepSeleccionado ->pivot-> estado == "En Stock" && InventarioClinica::where('id_articulo', $value->id_articulo)->first()->inventarioDepartamentos->where("id_servicio", $idServicio)->first()->pivot->lotes_disponibles < $artDepSeleccionado->pivot->stock_minimo){
+                               InventarioClinica::where('id_articulo', $value->id_articulo)->first()->inventarioDepartamentos()->updateExistingPivot($solicitud->id_servicio, ["estado"=>"En Minimos"]);
+                                   if($artDepSeleccionado -> pivot -> pedido_automatico == true){
+                                           $pedidoNuevo = new Pedidos();
+                                            $pedidoNuevo -> id_usuario_solicitante = Servicio::find($idServicio)->jefe_departamento;
+                                            $pedidoNuevo -> fecha_inicial = date('Y-m-d');
+                                            $pedidoNuevo -> fecha_aceptada = null;
+                                            $pedidoNuevo -> estado = "Pendiente";
+                                            $pedidoNuevo -> es_departamento = true;
+                                            $pedidoNuevo -> id_servicio = $idServicio;
+                                            $cantidadAPedir = $value -> articuloConPedidosAutomaticos -> where("id_usuario", Servicio::find($idServicio)->jefe_departamento) -> first() -> pivot -> stock_a_pedir;
+                                            $pedidoNuevo -> save();
+                                            $pedidoNuevo -> articulos() -> attach(InventarioClinica::find($artDepSeleccionado->pivot->id_articulo_clinica)->articulo->id_articulo, ["id_proveedor" => null, "lotes_recibidos" => $cantidadAPedir]);
+                                   }
+                           }
+                    }
+            }
+
+        return redirect()->route('solicitudes', $idServicio);
     }
 
     /**

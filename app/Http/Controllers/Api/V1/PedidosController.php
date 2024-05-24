@@ -28,32 +28,34 @@ class PedidosController extends Controller
 
     public function pedidosPendientesGestor($id){   
         $user = Usuario::find($id);
-        $pedido = $user -> pedidos -> where("fecha_aceptada", null);
+        $pedido = $user -> pedidos -> where("estado", "En Transito");
 
         $pedidosResultantes = [];
         $numero_productos = null;
-        foreach ($pedido as $key => $value) {
-            
-            $proveedor = Proveedor::find($value->proveedores[0]->id_proveedor);
-            $articulos = $value->articulos;
-            $costeArticulos = 0;
-
-                foreach ($articulos as $key2 => $value2) {
-                   $costeArticulos += $value2->pivot->lotes_recibidos * $value2->proveedores[0]->pivot->coste_por_lote;
-                }
-            $numero_productos = $value->articulos->count(); 
-
-            $p = [
-                'id_pedido' => $value->id_pedido,
-                'proveedor' => $value->proveedores[0]->nombre,
-                'fecha_inicial' => $value->fecha_inicial,
-                'numero_productos' => $numero_productos,
-                'coste' => $costeArticulos, 
-            ];
-           
-            $pedidosResultantes[] = $p;
-            
-        };
+        
+            foreach ($pedido as $key => $value) {
+                $proveedor = Proveedor::find($value->proveedores->first()->id_proveedor);
+                $articulos = $value->articulos;
+                $costeArticulos = 0;
+    
+                    foreach ($articulos as $key2 => $value2) {
+                       $costeArticulos += $value2->pivot->lotes_recibidos * $value2->proveedores[0]->pivot->coste_por_lote;
+                    }
+                $numero_productos = $value->articulos->count(); 
+    
+                $p = [
+                    'id_pedido' => $value->id_pedido,
+                    'proveedor' => $value->proveedores[0]->nombre,
+                    'fecha_inicial' => $value->fecha_inicial,
+                    'numero_productos' => $numero_productos,
+                    'coste' => $costeArticulos, 
+                ];
+               
+                $pedidosResultantes[] = $p;
+                
+            };
+      
+        
         return response()->json($pedidosResultantes);
     }
 
@@ -261,7 +263,6 @@ class PedidosController extends Controller
         $articulosDeSolicitud = $solicitud -> articulos;
          
         foreach($articulosDeSolicitud as $key => $value){
-             
            $existeArticuloEnDepartamento = InventarioClinica::where('id_articulo', $value->id_articulo)->first()->inventarioDepartamentos->where("id_servicio", $solicitud -> id_servicio)->count();;
 
            $artDepSeleccionado = InventarioClinica::where('id_articulo', $value->id_articulo)->first();
@@ -292,16 +293,16 @@ class PedidosController extends Controller
                        if($artDepSeleccionado -> estado == "En Stock" && $artDepSeleccionado->lotes_disponibles < $artDepSeleccionado->stock_minimo){
                                $artDepSeleccionado -> estado == "En Minimos";
                                    if($artDepSeleccionado -> pedido_automatico == true){
-                                           $pedidoNuevo = new Pedidos();
+                                            $pedidoNuevo = new Pedidos();
                                             $pedidoNuevo -> id_usuario_solicitante = $idUsuario;
                                             $pedidoNuevo -> fecha_inicial = date('Y-m-d');
                                             $pedidoNuevo -> fecha_aceptada = null;
                                             $pedidoNuevo -> estado = "En Transito";
                                             $pedidoNuevo -> es_departamento = false;
                                             $pedidoNuevo -> id_servicio = null;
-                                            $pedidoNuevo -> save();
                                             $cantidadAPedir = $value -> articuloConPedidosAutomaticos -> first() -> pivot -> stock_a_pedir;
-                                            $proveedorAPedir = $value -> articuloConPedidosAutomaticos -> first() -> pivot -> id_proveedor;
+                                            $proveedorAPedir = $value -> articuloConPedidosAutomaticos -> where("id_usuario", $idUsuario) -> first() -> pivot -> id_proveedor;
+                                            $pedidoNuevo -> save();
                                             $pedidoNuevo -> articulos() -> attach($artDepSeleccionado->id_articulo, ["id_proveedor" => $proveedorAPedir, "lotes_recibidos" => $cantidadAPedir]);
                                    }
                            }

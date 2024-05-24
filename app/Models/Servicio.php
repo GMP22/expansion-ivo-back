@@ -30,5 +30,4 @@ class Servicio extends Model
     public function articulosDepartamento(){
         return $this->belongsToMany(InventarioClinica::class, 'inventario_departamentos', 'id_departamento', 'id_articulo_clinica');
     }
-    
 }

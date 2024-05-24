@@ -178,8 +178,7 @@ class InventarioClinicaController extends Controller
         $rdo = [];
         foreach ($articulos as $key => $value) {
             $articuloClinica = InventarioClinica::where("id_articulo", $value->id_articulo)->first();
-
-            if ($articuloClinica->estado == "En Minimos" || $value -> lotes_recibidos > $articuloClinica->lotes_disponibles) {
+            if ($articuloClinica->estado == "En Minimos" || $value -> pivot -> lotes_recibidos > $articuloClinica->lotes_disponibles) {
                 $p = [
                     "id_articulo" => $value->id_articulo,
                     "nombre_articulo" => $value->nombre,

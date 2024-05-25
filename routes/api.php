@@ -79,6 +79,11 @@ Route::group([
     
     Route::get('obtener-personal/{id_rol}', [App\Http\Controllers\Api\V1\UsuarioController::class, 'show']);
 
+    Route::post('registrar-articulos-en-cita/{id_cita}', [App\Http\Controllers\Api\V1\DiagnosticoController::class, 'registrarArticulosCita']);
+    Route::post('modificar-articulos-en-cita/{id_cita}', [App\Http\Controllers\Api\V1\DiagnosticoController::class, 'modificarArticulosCita']);
+
+    Route::get('inventario-medico-cita/{id_cita}', [App\Http\Controllers\Api\V1\DiagnosticoController::class, 'inventarioMedicoCita']);
+
     Route::get('citas-pendiente-radiologo/{fecha}/{id_radiologo}', [App\Http\Controllers\Api\V1\CitaController::class, 'getCitasPendientesRadiologo']);
     Route::get('citas-realizada-radiologo/{fecha}/{id_radiologo}', [App\Http\Controllers\Api\V1\CitaController::class, 'getCitasRealizadaRadiologo']);
     Route::post('crear-prueba', [App\Http\Controllers\Api\V1\PruebaController::class, 'store']);

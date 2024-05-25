@@ -7,6 +7,7 @@ use App\Http\Resources\V1\DiagnosticoResource;
 use App\Models\Diagnostico;
 use App\Models\Paciente;
 use App\Models\Cita;
+use App\Models\InventarioClinica;
 use Illuminate\Http\Request;
 
 class DiagnosticoController extends Controller
@@ -62,6 +63,70 @@ class DiagnosticoController extends Controller
         
 
         return response()->json(['message' => 'Diagnostico creado correctamente'], 201);
+    }
+
+    public function inventarioMedicoCita ($idCita){
+
+        $citaDelPaciente = Cita::find($idCita);
+
+        $inventario = InventarioClinica::all();
+        $articulosResultantes = [];
+
+        foreach ($inventario as $key => $value) {
+            $a = $value->inventarioMedicos->where("id_usuario_medico", $citaDelPaciente->id_usuario_medico)->first();
+
+            if ($a != null) {
+                $nombreArticulo = $value -> articulo -> nombre;
+                $categoria = $value -> articulo -> categoria -> nombre_categoria;
+
+                $pedidos = $value -> articulo -> pedidos -> where('estado', "Aceptada") -> where('id_usuario_solicitante', $idMedico) -> where("es_departamento", false);
+                $fechas = [];
+
+                $cantidadASacar = $a -> pivot -> lotes_disponibles;
+
+                // 
+                // Aqui tenemos que organizar bien como sacar los elementos que ya estan registrados en una cita
+                //
+
+                $p = [
+                    'id_articulo_clinica' => $a -> pivot -> id_articulo_departamento,
+                    'nombre_articulo' => $nombreArticulo,
+                    'nombre_categoria' => $categoria,
+                    'numero_lotes' => 
+                    'estado' => "null",
+                    'ultima_fecha_recibida' => "null",
+                ];
+
+                $articulosResultantes[] = $p;
+            }
+        }
+
+        return response()->json($articulosResultantes);
+
+    }
+
+    public function registrarArticulosCita($idCita, Request $request){
+
+        $citaDelPaciente = Cita::find($idCita);
+        $articulos = $request->all();
+
+            foreach ($articulos as $key => $value) {
+                $citaDelPaciente->articulosEnCita() -> attach($idCita, ["id_articulo" => $value["id_articulo_clinica"]]);
+            }
+
+        return response()->json($citaDelPaciente->articulosEnCita, 201);
+    }
+
+    public function modificarArticulosCita($idCita, Request $request){
+
+        $citaDelPaciente = Cita::find($idCita);
+        $articulos = $request->all();
+
+            foreach ($articulos as $key => $value) {
+                $citaDelPaciente->articulosEnCita() -> updateExistingPivot($idCita, ["id_articulo" => $value["id_articulo_clinica"]]);
+            }
+
+        return response()->json($citaDelPaciente->articulosEnCita, 201);
     }
 
     public function mostrarDiagnostico($idCita){

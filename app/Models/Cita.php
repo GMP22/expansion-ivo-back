@@ -22,6 +22,9 @@ class Cita extends Model
         'estado',
     ];
 
+    public function articulosEnCita(){
+        return $this->belongsToMany(InventarioClinica::class, 'articulos_por_cita', 'id_cita', 'id_articulo');
+    }
 
     public function medicos(){
         return $this->belongsTo(Medico::class);

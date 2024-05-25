@@ -265,6 +265,27 @@ class PedidosController extends Controller
         return response()->json($xd, 200);
     }
 
+    public function registrarPedidosMedico($idUsuario, Request $request){
+        $articulosAPedir = $request->all();
+       
+        $xd = "Pedidos Procesados exitosamente";
+
+            $pedido = new Pedidos();
+            $pedido -> id_usuario_solicitante = $idUsuario;
+            $pedido -> fecha_inicial = date("Y-m-d");
+            $pedido -> estado = "Pendiente";
+            $pedido -> es_departamento = false;
+            $pedido -> id_servicio = 6;
+            $pedido -> save();
+            
+            foreach ($articulosAPedir as $key => $value) {
+                $articulo = InventarioClinica::find($value["id_articulo"]) -> articulo -> id_articulo;
+                $pedido -> articulos() -> attach($articulo, ["id_proveedor" => null, "lotes_recibidos" => $value["nLotes"]]);
+            }
+            
+        return response()->json($xd, 200);
+    }
+
     public function recibirPedidoGestor($idArticulo){
         $pedido = Pedidos::find($idArticulo);
         

@@ -137,6 +137,7 @@ Route::group([
     Route::get('detalles-articulo-segun-proveedor/{idArticulo}/{idProveedor}', [App\Http\Controllers\Api\V1\AlmacenGeneralController::class, 'detallesArticulosSegunProveedor']);
     Route::get('articulo-segun-proveedor/{idArticulo}', [App\Http\Controllers\Api\V1\AlmacenGeneralController::class, 'proveedoresSegunArticulo']);
     Route::post('registrar-pedido-gestor/{idArticulo}', [App\Http\Controllers\Api\V1\PedidosController::class,'registrarPedidosGestor']);
+    Route::post('registrar-pedido-medico/{idMedico}', [App\Http\Controllers\Api\V1\PedidosController::class,'registrarPedidosMedico']);
     Route::get('recibir-pedido-gestor/{idArticulo}', [App\Http\Controllers\Api\V1\PedidosController::class,'recibirPedidoGestor']);
     Route::post('aceptar-solicitud-gestor/{idUsuario}/{idPedido}', [App\Http\Controllers\Api\V1\PedidosController::class,'aceptarSolicitudes']);
 });

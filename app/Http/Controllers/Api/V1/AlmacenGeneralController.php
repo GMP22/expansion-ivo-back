@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\AlmacenGeneral;
 use App\Models\Proveedor;
+use App\Models\InventarioClinica;
+
 class AlmacenGeneralController extends Controller
 {
     /**
@@ -17,6 +19,25 @@ class AlmacenGeneralController extends Controller
         $articulos = AlmacenGeneral::all('id_articulo', 'nombre');
 
         return response()->json($articulos);
+    }
+
+    public function articulosCrearPedidoMedico(){
+        $articulos = InventarioClinica::all();
+
+        $arts = [];
+
+        foreach ($articulos as $key => $value) {
+
+            if ($value->inventarioDepartamentos->where("id_servicio", 6)->first() != null) {
+                $p [] = [
+                    "id_articulo" => $value->inventarioDepartamentos->where("id_servicio", 6)->first()->pivot->id_articulo_clinica,
+                    "nombre" => AlmacenGeneral::find($value->id_articulo)->nombre,
+                    "nombre_categoria" => AlmacenGeneral::find($value->id_articulo)->categoria ->nombre_categoria
+                ];
+                $arts = $p;
+            }
+        }
+        return response()->json($arts);
     }
 
     /**

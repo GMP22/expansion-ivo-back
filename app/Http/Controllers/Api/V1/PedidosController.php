@@ -59,6 +59,55 @@ class PedidosController extends Controller
         return response()->json($pedidosResultantes);
     }
 
+    public function pedidosPendientesMedico($id){   
+        $user = Usuario::find($id);
+        $pedido = $user -> pedidos -> where("estado", "Pendiente");
+
+        $pedidosResultantes = [];
+        $numero_productos = null;
+        
+            foreach ($pedido as $key => $value) {
+                $articulos = $value->articulos;
+                $numero_productos = $value->articulos->count(); 
+    
+                $p = [
+                    'id_pedido' => $value->id_pedido,
+                    'proveedor' => null,
+                    'fecha_inicial' => $value->fecha_inicial,
+                    'numero_productos' => $numero_productos,
+                    'coste' => null, 
+                ];
+                $pedidosResultantes[] = $p;
+            };
+        
+        return response()->json($pedidosResultantes);
+    }
+
+    public function pedidosRecibidosMedico($id){   
+        $user = Usuario::find($id);
+        $pedido = $user -> pedidos -> where("estado", "Aceptada");
+
+        $pedidosResultantes = [];
+        $numero_productos = null;
+        
+            foreach ($pedido as $key => $value) {
+                $articulos = $value->articulos;
+                $numero_productos = $value->articulos->count(); 
+    
+                $p = [
+                    'id_pedido' => $value->id_pedido,
+                    'proveedor' => null,
+                    'fecha_inicial' => $value->fecha_inicial,
+                    'fecha_aceptada' => $value->fecha_aceptada,
+                    'numero_productos' => $numero_productos,
+                    'coste' => null, 
+                ];
+                $pedidosResultantes[] = $p;
+            };
+        
+        return response()->json($pedidosResultantes);
+    }
+
     public function detallesPedido($id){
         $pedido = Pedidos::find($id);
         $articulos = $pedido -> articulos;
@@ -314,48 +363,4 @@ class PedidosController extends Controller
        
     
 
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
 }

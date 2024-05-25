@@ -89,6 +89,10 @@ Route::group([
     Route::get('pedido', [App\Http\Controllers\Api\V1\PedidosController::class, 'index']);
     Route::get('pedidos/{id}', [App\Http\Controllers\Api\V1\PedidosController::class, 'mostrarPedidosSegunId']);
     Route::get('pedidos-pendientes-gestor/{id}', [App\Http\Controllers\Api\V1\PedidosController::class, 'pedidosPendientesGestor']);
+
+    Route::get('pedidos-pendientes-medico/{id}', [App\Http\Controllers\Api\V1\PedidosController::class, 'pedidosPendientesMedico']);
+    Route::get('pedidos-recibidos-medico/{id}', [App\Http\Controllers\Api\V1\PedidosController::class, 'pedidosRecibidosMedico']);
+
     Route::get('pedidos-recibidos-gestor/{id}', [App\Http\Controllers\Api\V1\PedidosController::class, 'pedidosRecibidosGestor']);
 
     Route::get('pedidos-pendientes-medico/{id}/{estado}', [App\Http\Controllers\Api\V1\PedidosController::class, 'pedidosPendientesMedico']);
@@ -125,7 +129,10 @@ Route::group([
     Route::post('eliminar-funcion-automatica', [App\Http\Controllers\Api\V1\InventarioClinicaController::class, 'eliminarFuncionAutomatica']);
     
     Route::post('cambiar-minimo-gestor/{id}', [App\Http\Controllers\Api\V1\InventarioClinicaController::class, 'cambiarMinimos']);
+    
     Route::get('articulos-crear-pedido', [App\Http\Controllers\Api\V1\AlmacenGeneralController::class, 'articulosCrearPedido']);
+    Route::get('articulos-crear-pedido-medico', [App\Http\Controllers\Api\V1\AlmacenGeneralController::class, 'articulosCrearPedidoMedico']);
+
     Route::get('detalles-articulo-crear-pedido/{id}', [App\Http\Controllers\Api\V1\AlmacenGeneralController::class, 'detallesArticulosCrearPedido']);
     Route::get('detalles-articulo-segun-proveedor/{idArticulo}/{idProveedor}', [App\Http\Controllers\Api\V1\AlmacenGeneralController::class, 'detallesArticulosSegunProveedor']);
     Route::get('articulo-segun-proveedor/{idArticulo}', [App\Http\Controllers\Api\V1\AlmacenGeneralController::class, 'proveedoresSegunArticulo']);

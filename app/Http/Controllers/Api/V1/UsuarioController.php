@@ -56,7 +56,7 @@ class UsuarioController extends Controller
         $usuario -> nombre_cuenta = $request -> input('nombre_cuenta');
         $usuario -> password = $request -> input('password');
         $usuario -> id_rol = $request -> input('id_rol');    
-
+        $usuario -> esJefe = false;
         $usuario->save();
         return response()->json(['message' => 'Usuario correctamente'], 201);
     }

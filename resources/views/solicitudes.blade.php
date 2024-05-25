@@ -131,7 +131,7 @@
                     }
                 $('#minimos-table').DataTable(dtOptions);
                 modal1.toggle();
-            }
+            } 
         }
     });
     }

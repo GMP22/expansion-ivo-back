@@ -45,6 +45,43 @@ class InventarioClinicaController extends Controller
         return response()->json($articulosResultantes);
     }
 
+    public function indexMedico($idMedico){
+        $inventario = InventarioClinica::all();
+        $articulosResultantes = [];
+
+        foreach ($inventario as $key => $value) {
+            $a = $value->inventarioMedicos->where("id_usuario_medico", $idMedico)->first();
+
+            if ($a != null) {
+                $nombreArticulo = $value -> articulo -> nombre;
+                $categoria = $value -> articulo -> categoria -> nombre_categoria;
+
+                $pedidos = $value -> articulo -> pedidos -> where('estado', "Aceptada") -> where('id_usuario_solicitante', $idMedico) -> where("es_departamento", false);
+                $fechas = [];
+
+                    foreach ($pedidos as $key2 => $value2) {
+                            if ($value2 -> usuario -> rol -> id_rol == 2) { // numero de rol del medico
+                                $fechas [] = $value2 -> fecha_aceptada;
+                            }
+                    }
+
+                $p = [
+                    'id_articulo_clinica' => $a -> pivot -> id_articulo_departamento,
+                    'nombre_articulo' => $nombreArticulo,
+                    'nombre_categoria' => $categoria,
+                    'numero_lotes' => $a -> pivot -> lotes_disponibles,
+                    'estado' => $a -> pivot -> estado,
+                    'ultima_fecha_recibida' => $fechas[array_key_last($fechas)],
+                ];
+
+                $articulosResultantes[] = $p;
+            }
+        }
+
+        return response()->json($articulosResultantes);
+    }
+
+
     public function numeroMinimosGestor(){
         $numero = InventarioClinica::where("estado", "En Minimos")->get()->count();
         return response()->json($numero, 200); 
@@ -91,6 +128,15 @@ class InventarioClinicaController extends Controller
         return response()->json($articulo, 200); 
     }
 
+    public function detallesArticuloMedico($idUsuario, $idArticulo){
+        $articulo = collect(InventarioClinica::find($idArticulo)->inventarioMedicos->where("id_usuario_medico", $idUsuario)->first()->pivot);
+        
+        $info = AlmacenGeneral::find(InventarioClinica::find($idArticulo)->id_articulo);
+
+        $articulo -> put('nombre', $info->nombre);
+        return response()->json($articulo, 200); 
+    }
+
     public function pedidosConArticuloEspecifico($id){
         $pedidos=InventarioClinica::find($id)->articulo->pedidos->where("es_departamento", false)->where("estado", "Recibido");
         
@@ -102,6 +148,21 @@ class InventarioClinicaController extends Controller
                     "id_pedido" => $value -> id_pedido,
                     "id_proveedor" => $proveedor -> id_proveedor,
                     "nombre" => $proveedor -> nombre,
+                    "lotes_recibidos" => $value -> pivot -> lotes_recibidos,
+                ];
+                $p [] = $x;
+        }
+        return response()->json($p, 200);
+    }
+
+    public function pedidosConArticuloEspecificoMedico($idUsuario, $idArticulo){
+        $pedidos=InventarioClinica::find($idArticulo)->articulo->pedidos->where("es_departamento", false)->where("estado", "Aceptada")->where("id_usuario_solicitante", $idUsuario);
+        $p = [];
+        foreach ($pedidos as $key => $value) {
+                $x = [
+                    "id_pedido" => $value -> id_pedido,
+                    "id_proveedor" => null,
+                    "nombre" => null,
                     "lotes_recibidos" => $value -> pivot -> lotes_recibidos,
                 ];
                 $p [] = $x;
@@ -153,6 +214,7 @@ class InventarioClinicaController extends Controller
         return response()->json($articulo -> estado, 200);
     }
 
+
     public function nuevaFunctionAutomatica(Request $request){
         $articulo = AlmacenGeneral::find($request->id_articulo);
         $texto = "hola";
@@ -165,6 +227,43 @@ class InventarioClinicaController extends Controller
         }
         return response()->json($texto, 200);
     }
+
+
+    public function cambiarMinimosMedico($idUsuario, $idArticulo, Request $request){
+        
+        $articulo = InventarioClinica::find($idArticulo)->inventarioMedicos->where("id_usuario_medico", $idUsuario)->first()->pivot;
+        $articulo -> stock_minimo = $request[0];
+
+        if ($articulo -> stock_minimo > $articulo -> lotes_disponibles) {
+            $articulo -> estado = "En Minimos";
+        } else {
+            $articulo -> estado = "En Stock";
+        }
+
+        $articulo -> save();
+        return response()->json($articulo -> estado, 200);
+    }
+
+    public function nuevaFunctionAutomaticaMedico(Request $request){
+        $articulo = InventarioClinica::find($request->id_articulo)->articulo->first();
+        $texto = "hola";
+        if ($articulo -> articuloConPedidosAutomaticos->where('id_usuario', $request->id_usuario)->count() == 0) {
+            $articulo -> articuloConPedidosAutomaticos() -> attach($articulo->id_articulo, ["id_usuario"=>$request->id_usuario, "id_proveedor"=>null, "stock_a_pedir"=>$request->cantidad]);
+            InventarioClinica::find($request->id_articulo)->inventarioMedicos()->updateExistingPivot($request->id_usuario, ["pedido_automatico" => true]);
+            $texto = "creado";
+        } else {
+            $articulo -> articuloConPedidosAutomaticos() -> updateExistingPivot($request->id_usuario, ["stock_a_pedir"=>$request->cantidad]);
+            $texto = "actualizado";
+        }
+        return response()->json($texto, 200);
+    }
+
+    public function eliminarFuncionAutomaticaMedico(Request $request){
+        $articulo = InventarioClinica::find($request->id_articulo)->articulo->first();
+        $articulo -> articuloConPedidosAutomaticos() -> detach($request->id_usuario);
+        InventarioClinica::find($request->id_articulo)->inventarioMedicos()->updateExistingPivot($request->id_usuario, ["pedido_automatico" => false]);
+        return response()->json("Eliminado exitosamente el pedido automatico", 200);
+    }       
 
     public function eliminarFuncionAutomatica(Request $request){
         $articulo = AlmacenGeneral::find($request->id_articulo);

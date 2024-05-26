@@ -247,6 +247,7 @@ class InventarioClinicaController extends Controller
             InventarioClinica::find($request->id_articulo)->inventarioMedicos()->updateExistingPivot($request->id_usuario, ["pedido_automatico" => true]);
             $texto = "creado";
         } else {
+            InventarioClinica::find($request->id_articulo)->inventarioMedicos()->updateExistingPivot($request->id_usuario, ["pedido_automatico" => true]);
             $articulo -> articuloConPedidosAutomaticos() -> updateExistingPivot($request->id_usuario, ["stock_a_pedir"=>$request->cantidad]);
             $texto = "actualizado";
         }

@@ -81,7 +81,6 @@ Route::group([
 
     Route::post('registrar-articulos-en-cita/{id_cita}', [App\Http\Controllers\Api\V1\DiagnosticoController::class, 'registrarArticulosCita']);
     Route::post('modificar-articulos-en-cita/{id_cita}', [App\Http\Controllers\Api\V1\DiagnosticoController::class, 'modificarArticulosCita']);
-
     Route::get('inventario-medico-cita/{id_cita}', [App\Http\Controllers\Api\V1\DiagnosticoController::class, 'inventarioMedicoCita']);
 
     Route::get('citas-pendiente-radiologo/{fecha}/{id_radiologo}', [App\Http\Controllers\Api\V1\CitaController::class, 'getCitasPendientesRadiologo']);

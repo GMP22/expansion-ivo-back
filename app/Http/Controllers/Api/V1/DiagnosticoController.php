@@ -7,6 +7,7 @@ use App\Http\Resources\V1\DiagnosticoResource;
 use App\Models\Diagnostico;
 use App\Models\Paciente;
 use App\Models\Cita;
+use App\Models\Pedidos;
 use App\Models\InventarioClinica;
 use Illuminate\Http\Request;
 
@@ -69,31 +70,31 @@ class DiagnosticoController extends Controller
 
         $citaDelPaciente = Cita::find($idCita);
 
+        $articulosEnCitas = $citaDelPaciente -> articulosEnCita;
+
         $inventario = InventarioClinica::all();
         $articulosResultantes = [];
 
         foreach ($inventario as $key => $value) {
             $a = $value->inventarioMedicos->where("id_usuario_medico", $citaDelPaciente->id_usuario_medico)->first();
 
-            if ($a != null) {
+            if ($a != null) { // Esto se hace para verificar que efectivamente el medico en cuestion TIENE ese articulo
                 $nombreArticulo = $value -> articulo -> nombre;
                 $categoria = $value -> articulo -> categoria -> nombre_categoria;
+                $cantidadASacar = 0;
 
-                $pedidos = $value -> articulo -> pedidos -> where('estado', "Aceptada") -> where('id_usuario_solicitante', $idMedico) -> where("es_departamento", false);
-                $fechas = [];
-
-                $cantidadASacar = $a -> pivot -> lotes_disponibles;
-
-                // 
-                // Aqui tenemos que organizar bien como sacar los elementos que ya estan registrados en una cita
-                //
+                    foreach ($articulosEnCitas as $key2 => $value2) { // Aqui buscamos que articulos fueron usados en la cita
+                        if ($value2 -> pivot -> id_articulo == $value -> id_articulo_clinica) {
+                            $cantidadASacar = $value2 -> pivot -> lotes_usados;
+                        }
+                    }
 
                 $p = [
                     'id_articulo_clinica' => $a -> pivot -> id_articulo_departamento,
                     'nombre_articulo' => $nombreArticulo,
                     'nombre_categoria' => $categoria,
-                    'numero_lotes' => 
-                    'estado' => "null",
+                    'numero_lotes' => $cantidadASacar,
+                    'estado' => $a->pivot->lotes_disponibles,
                     'ultima_fecha_recibida' => "null",
                 ];
 
@@ -109,21 +110,67 @@ class DiagnosticoController extends Controller
 
         $citaDelPaciente = Cita::find($idCita);
         $articulos = $request->all();
-
+       
             foreach ($articulos as $key => $value) {
-                $citaDelPaciente->articulosEnCita() -> attach($idCita, ["id_articulo" => $value["id_articulo_clinica"]]);
-            }
+                $lotesDisponibles = InventarioClinica::find($value["id_articulo_clinica"])->inventarioMedicos->where("id_usuario_medico", $citaDelPaciente->id_usuario_medico)->first()->pivot->lotes_disponibles;
+                InventarioClinica::find($value["id_articulo_clinica"])->inventarioMedicos()->updateExistingPivot($citaDelPaciente->id_usuario_medico,["lotes_disponibles" => $lotesDisponibles - $value["numero_lotes"]]);
+                $citaDelPaciente->articulosEnCita() -> attach($idCita, ["id_articulo" => $value["id_articulo_clinica"], "lotes_usados" => $value["numero_lotes"]]);
 
+                $articuloSeleccionado = InventarioClinica::find($value["id_articulo_clinica"])->inventarioMedicos->where("id_usuario_medico",$citaDelPaciente->id_usuario_medico)->first();
+
+                if ($articuloSeleccionado->pivot->lotes_disponibles < $articuloSeleccionado->pivot->stock_minimo) {
+                    InventarioClinica::find($value["id_articulo_clinica"])->inventarioMedicos()->updateExistingPivot($citaDelPaciente->id_usuario_medico,["estado" => "En Minimos"]);
+
+                    if ($articuloSeleccionado -> pivot-> pedido_automatico == true) {
+                        $pedidoNuevo = new Pedidos();
+                        $pedidoNuevo -> id_usuario_solicitante = $citaDelPaciente->id_usuario_medico;
+                        $pedidoNuevo -> fecha_inicial = date('Y-m-d');
+                        $pedidoNuevo -> fecha_aceptada = null;
+                        $pedidoNuevo -> estado = "Pendiente";
+                        $pedidoNuevo -> es_departamento = false;
+                        $pedidoNuevo -> id_servicio = 6;
+                        $cantidadAPedir = InventarioClinica::find($value["id_articulo_clinica"]) -> articulo -> first() -> articuloConPedidosAutomaticos -> where("id_usuario", $citaDelPaciente->id_usuario_medico) -> first() -> pivot -> stock_a_pedir;
+                        $pedidoNuevo -> save();
+                        $pedidoNuevo -> articulos() -> attach(InventarioClinica::find($value["id_articulo_clinica"])->articulo->id_articulo, ["id_proveedor" => null, "lotes_recibidos" => $cantidadAPedir]);
+                    }
+                }
+            }
+            
         return response()->json($citaDelPaciente->articulosEnCita, 201);
     }
 
     public function modificarArticulosCita($idCita, Request $request){
 
         $citaDelPaciente = Cita::find($idCita);
-        $articulos = $request->all();
 
-            foreach ($articulos as $key => $value) {
-                $citaDelPaciente->articulosEnCita() -> updateExistingPivot($idCita, ["id_articulo" => $value["id_articulo_clinica"]]);
+        $articulosAnteriormenteMetidos = $citaDelPaciente -> articulosEnCita;
+
+            foreach ($articulosAnteriormenteMetidos as $key => $value) {
+                $lotesDisponibles = InventarioClinica::find($value->id_articulo_clinica)->inventarioMedicos->where("id_usuario_medico", $citaDelPaciente->id_usuario_medico)->first()->pivot->lotes_disponibles;
+                InventarioClinica::find($value->id_articulo_clinica)->inventarioMedicos()->updateExistingPivot($citaDelPaciente->id_usuario_medico,["lotes_disponibles" => $lotesDisponibles + $value->pivot->lotes_usados]);
+
+                $articuloSeleccionado = InventarioClinica::find($value->id_articulo_clinica)->inventarioMedicos->where("id_usuario_medico",$citaDelPaciente->id_usuario_medico)->first();
+
+                if ($articuloSeleccionado->pivot->lotes_disponibles < $articuloSeleccionado->pivot->stock_minimo) {
+                    InventarioClinica::find($value->id_articulo_clinica)->inventarioMedicos()->updateExistingPivot($citaDelPaciente->id_usuario_medico,["estado" => "En Minimos"]);
+                } else {
+                    InventarioClinica::find($value->id_articulo_clinica)->inventarioMedicos()->updateExistingPivot($citaDelPaciente->id_usuario_medico,["estado" => "En Stock"]);
+                }
+            }
+
+        $citaDelPaciente->articulosEnCita()->detach();
+        $articulos = $request->all();
+        
+            foreach ($articulos as $key => $value2) {
+                $lotesDisponibles2 = InventarioClinica::find($value2["id_articulo_clinica"])->inventarioMedicos->where("id_usuario_medico", $citaDelPaciente->id_usuario_medico)->first()->pivot->lotes_disponibles;
+                InventarioClinica::find($value2["id_articulo_clinica"])->inventarioMedicos()->updateExistingPivot($citaDelPaciente->id_usuario_medico,["lotes_disponibles" => $lotesDisponibles2 - $value2["numero_lotes"]]);
+                $citaDelPaciente->articulosEnCita() -> attach($idCita, ["id_articulo" => $value2["id_articulo_clinica"], "lotes_usados" => $value2["numero_lotes"]]);
+
+                $articuloSeleccionado = InventarioClinica::find($value2["id_articulo_clinica"])->inventarioMedicos->where("id_usuario_medico",$citaDelPaciente->id_usuario_medico)->first();
+
+                if ($articuloSeleccionado->pivot->lotes_disponibles < $articuloSeleccionado->pivot->stock_minimo) {
+                    InventarioClinica::find($value2["id_articulo_clinica"])->inventarioMedicos()->updateExistingPivot($citaDelPaciente->id_usuario_medico,["estado" => "En Minimos"]);
+                }
             }
 
         return response()->json($citaDelPaciente->articulosEnCita, 201);

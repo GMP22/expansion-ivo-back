@@ -23,7 +23,7 @@ class Cita extends Model
     ];
 
     public function articulosEnCita(){
-        return $this->belongsToMany(InventarioClinica::class, 'articulos_por_cita', 'id_cita', 'id_articulo');
+        return $this->belongsToMany(InventarioClinica::class, 'articulos_por_cita', 'id_cita', 'id_articulo')->withPivot("lotes_usados");
     }
 
     public function medicos(){

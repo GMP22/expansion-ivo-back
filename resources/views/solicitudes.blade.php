@@ -102,12 +102,29 @@
 
             <div>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" onclick="enviarDatos()">Confirmar</button>
+                <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" onclick="enviarDatos(true)">Confirmar</button>
             </div>  
       </div>
     </div>
 </div>
-            
+ 
+<div class="modal fade" id="confirmar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Confirmar Solicitud</h5>
+        </div>
+
+            <p style="display:none;" id="modalConfirmar">Aqui hay un id</p>
+
+            <div>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" onclick="enviarDatos(false)">Confirmar</button>
+            </div>  
+      </div>
+    </div>
+</div>
+
     <form style="display:none;" method="POST">
     @csrf
     @method('POST')
@@ -117,6 +134,7 @@
 <script type="text/javascript">
     function mirar(entrada){
         var modal1 = new bootstrap.Modal(document.getElementById('cambiarMinimos'));
+        var modal2 = new bootstrap.Modal(document.getElementById('confirmar'));
         $.ajax({
         url: "/solicitudes/{{Auth::guard('usuario')->user()->servicio->id_servicio}}/"+entrada+"/comprobar-minimos",
         type: 'GET',
@@ -131,18 +149,26 @@
                     }
                 $('#minimos-table').DataTable(dtOptions);
                 modal1.toggle();
-            } 
+            } else {
+                $("#confirmar").find("#modalConfirmar").addClass(""+entrada+"");
+                modal2.toggle();
+            }
         }
     });
     }
 
-    function enviarDatos(){
-        let contenido = $("#minimos-table").find("tbody").children();
-        for (let index = 0; index < contenido.length; index++) {
+    function enviarDatos(minimos){
+        let id_solicitud = "";
+        if (minimos == true) {
+            let contenido = $("#minimos-table").find("tbody").children();
+            for (let index = 0; index < contenido.length; index++) {
             $("form").append("<input type='number' name='" +$(contenido[index]).attr('id')+ "' value='" +$(contenido[index]).find('.cantidad').val()+"'>"); 
-        }
+            }
         
-        let id_solicitud = $("#minimos-table").find("tbody").attr("class");
+            id_solicitud = $("#minimos-table").find("tbody").attr("class");
+        } else {
+            id_solicitud = $("#modalConfirmar").attr("class");
+        }
 
         $("form").attr("action", "/solicitudes/{{Auth::guard('usuario')->user()->servicio->id_servicio}}/"+id_solicitud+"/aceptar-solicitud");
        document.querySelector("form").submit();

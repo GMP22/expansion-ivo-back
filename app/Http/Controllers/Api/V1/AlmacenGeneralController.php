@@ -21,7 +21,7 @@ class AlmacenGeneralController extends Controller
         return response()->json($articulos);
     }
 
-    public function articulosCrearPedidoMedico(){
+    public function articulosCrearPedidoMedico($idMedico){
         $articulos = InventarioClinica::all();
 
         $arts = [];
@@ -29,12 +29,20 @@ class AlmacenGeneralController extends Controller
         foreach ($articulos as $key => $value) {
 
             if ($value->inventarioDepartamentos->where("id_servicio", 6)->first() != null) {
+
+                $nLotes = 0;
+                if ($value -> inventarioMedicos -> where("id_servicio", 6) -> first() != null) {
+                    $nLotes = $value -> inventarioMedicos -> where("id_usuario_medico", $idMedico) -> first() -> pivot -> lotes_disponibles;
+                }
+
                 $p [] = [
                     "id_articulo" => $value->inventarioDepartamentos->where("id_servicio", 6)->first()->pivot->id_articulo_clinica,
                     "nombre" => AlmacenGeneral::find($value->id_articulo)->nombre,
-                    "nombre_categoria" => AlmacenGeneral::find($value->id_articulo)->categoria ->nombre_categoria
+                    "nombre_categoria" => AlmacenGeneral::find($value->id_articulo)->categoria ->nombre_categoria,
+                    "nLotes" =>$nLotes,
                 ];
                 $arts = $p;
+
             }
         }
         return response()->json($arts);

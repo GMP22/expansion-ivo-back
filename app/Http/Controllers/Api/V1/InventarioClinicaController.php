@@ -9,11 +9,15 @@ use App\Models\CategoriaArticulos;
 use App\Models\Usuario;
 use App\Models\Proveedor;
 use App\Models\Pedidos;
+use App\Models\Medico;
 use App\Models\AlmacenGeneral;
 
 class InventarioClinicaController extends Controller
 {
     
+
+    
+
     public function index(){
         $inventario = InventarioClinica::all();
         $articulosResultantes = [];
@@ -285,4 +289,74 @@ class InventarioClinicaController extends Controller
         return response()->json($rdo, 200);
     }
 
+    public function cuadrosInformativosInventarioMedico($idMedico){
+		$articulosAutomatico = Medico::find($idMedico) -> articulosMedicos;
+		$articulosMinimos = Medico::find($idMedico) -> articulosMedicos;
+        $cantidad1 = 0;
+        $cantidad2 = 0;
+
+            foreach ($articulosAutomatico as $key => $value) {
+                
+                if ($value -> pivot -> pedido_automatico == true) {
+                    $cantidad1++;
+                }
+
+            }
+
+            foreach ($articulosMinimos as $key2 => $value2) {
+                if ($value2 -> pivot -> estado == "En Minimos") {
+                    $cantidad2++;
+                }
+            }
+
+			$p = [
+			"articulos_automaticos" => $cantidad1,
+			"articulos_minimos" => $cantidad2,
+			];
+			
+			return response()->json($p);
+        }
+
+        public function articulosMinimosMedico($idMedico){
+            $articulosMinimos = InventarioClinica::all();
+            $nombres = [];
+            foreach ($articulosMinimos as $key => $value) {
+    
+                if($value -> inventarioMedicos -> where("id_usuario_medico", $idMedico) -> first() != null){
+                    $articuloSeleccionado = $value -> inventarioMedicos -> where("id_usuario_medico", $idMedico) -> first() -> pivot;
+                    if($articuloSeleccionado->estado == "En Minimos"){
+                         $p = [
+                            'id_articulo' => $articuloSeleccionado -> id_articulo_departamento,
+                            'nombre' => AlmacenGeneral::find($value -> id_articulo)->nombre,
+                            'nombre_categoria' => AlmacenGeneral::find($value -> id_articulo)->categoria->first()->nombre_categoria,
+                        ];
+                         $nombres[] = $p;
+                    } 
+                }
+            }
+            return response()->json($nombres, 200); 
+        }
+
+        public function articulosAutomaticosMedico($idMedico){
+            $articulosMinimos = InventarioClinica::all();
+            $nombres = [];
+            foreach ($articulosMinimos as $key => $value) {
+    
+                if($value -> inventarioMedicos -> where("id_usuario_medico", $idMedico) -> first() != null){
+                    $articuloSeleccionado = $value -> inventarioMedicos -> where("id_usuario_medico", $idMedico) -> first() -> pivot;
+                    
+                    if($articuloSeleccionado->pedido_automatico == true){
+                    
+                         $p = [
+                            'id_articulo' => $articuloSeleccionado -> id_articulo_departamento,
+                            'nombre' => AlmacenGeneral::find($value -> id_articulo)->nombre,
+                            'nombre_categoria' => AlmacenGeneral::find($value -> id_articulo)->categoria->first()->nombre_categoria,
+                        ];
+                         $nombres[] = $p;
+                    } 
+    
+                }
+            }
+            return response()->json($nombres, 200); 
+        }
 }

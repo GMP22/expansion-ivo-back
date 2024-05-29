@@ -7,6 +7,7 @@ use App\Http\Resources\V1\PedidosPendientesResource;
 use App\Models\Pedidos;
 use App\Models\Usuario;
 use App\Models\Proveedor;
+use App\Models\Medico;
 use App\Models\InventarioClinica;
 use Illuminate\Http\Request;
 
@@ -382,6 +383,25 @@ class PedidosController extends Controller
         return response()->json("Solicitud aceptada exitosamente", 200); 
     }
        
+    public function cuadrosInformativosPedidosMedico($idMedico){
+		$pedidosPendientes = Pedidos::where("id_usuario_solicitante", $idMedico) -> where("estado", "Pendiente")  -> count();
+		$pedidosAceptados = Pedidos::where("id_usuario_solicitante", $idMedico) -> where("estado", "Aceptada")  -> count();
+		$articulos = Medico::find($idMedico) -> articulosMedicos;
+        $cantidad = 0;
+        foreach ($articulos as $key => $value) {
+            if ($value -> pivot -> estado == "En Minimos") {
+                $cantidad++;
+            }
+        }
+
+			$p = [
+			"pedidos_pendientes" => $pedidosPendientes,
+			"pedidos_aceptados" => $pedidosAceptados,
+			"articulosEnMinimos" => $cantidad,
+			];
+			
+		return response()->json($p);
+}
     
 
 }

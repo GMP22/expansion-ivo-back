@@ -31,21 +31,68 @@ class AlmacenGeneralController extends Controller
             if ($value->inventarioDepartamentos->where("id_servicio", 6)->first() != null) {
 
                 $nLotes = 0;
+                $estado = "";
                 if ($value -> inventarioMedicos -> where("id_servicio", 6) -> first() != null) {
                     $nLotes = $value -> inventarioMedicos -> where("id_usuario_medico", $idMedico) -> first() -> pivot -> lotes_disponibles;
+                    $estado = $value -> inventarioMedicos -> where("id_usuario_medico", $idMedico) -> first() -> pivot -> estado;
                 }
 
                 $p [] = [
                     "id_articulo" => $value->inventarioDepartamentos->where("id_servicio", 6)->first()->pivot->id_articulo_clinica,
                     "nombre" => AlmacenGeneral::find($value->id_articulo)->nombre,
-                    "nombre_categoria" => AlmacenGeneral::find($value->id_articulo)->categoria ->nombre_categoria,
-                    "nLotes" =>$nLotes,
+                    "nombre_categoria" => AlmacenGeneral::find($value->id_articulo)->categoria->nombre_categoria,
+                    "nLotes" => $nLotes,
+                    "nombre_proveedor" => $estado, // Se reutiliza la interfaz para poder almacenar el estado y con eso marcar el item en el listado
                 ];
+                
                 $arts = $p;
-
             }
         }
         return response()->json($arts);
+    }
+    
+ /*
+	Esta es la version donde se filtra por el estado
+*/   
+    
+    public function articulosMinimosCrearPedidoMedico($idMedico){
+        $articulos = InventarioClinica::all();
+
+        $arts = [];
+
+        foreach ($articulos as $key => $value) {
+
+            if ($value->inventarioDepartamentos->where("id_servicio", 6)->first() != null && $value -> inventarioMedicos -> where("id_usuario_medico", $idMedico) -> first() != null) {
+							
+			    if($value -> inventarioMedicos -> where("id_usuario_medico", $idMedico) -> first() -> pivot -> estado == "En Minimos"){
+							
+		                $nLotes = 0;
+		                if ($value -> inventarioMedicos -> where("id_servicio", 6) -> first() != null) {
+		                    $nLotes = $value -> inventarioMedicos -> where("id_usuario_medico", $idMedico) -> first() -> pivot -> lotes_disponibles;
+		                }
+		
+		                $p [] = [
+		                    "id_articulo" => $value->inventarioDepartamentos->where("id_servicio", 6)->first()->pivot->id_articulo_clinica,
+		                    "nombre" => AlmacenGeneral::find($value->id_articulo)->nombre,
+		                    "nombre_categoria" => AlmacenGeneral::find($value->id_articulo)->categoria ->nombre_categoria,
+		                    "nLotes" => $nLotes,
+		                    "nombre_proveedor" => $value -> inventarioMedicos -> where("id_usuario_medico", $idMedico) -> first() -> pivot -> estado, // Se reutiliza la interfaz para poder almacenar el estado y con eso marcar el item en el listado
+		                ];
+		                
+		                $arts = $p;
+		                
+		           }   
+            }
+        }
+        return response()->json($arts);
+    }
+
+    public function numeroLotesCrearPedidoMedico($idMedico, $idArticulo){
+        if (InventarioClinica::find($idArticulo) -> inventarioMedicos ->  where("id_usuario_medico", $idMedico) -> first() != null) {
+            $nLotes = InventarioClinica::find($idArticulo) -> inventarioMedicos ->  where("id_usuario_medico", $idMedico) -> first() -> pivot  -> lotes_disponibles;
+            return response()->json($nLotes);
+        }
+        return response()->json(0);
     }
 
     /**

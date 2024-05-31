@@ -131,7 +131,7 @@
             <div class="row mt-3">
                 <div class="col-12 d-flex justify-content-between">
                     <button type="button" class="btn btn-cancelar" data-bs-dismiss="modal">Cancelar</button>
-                    <button style="margin-left: 50px" type="submit" class="btn btn-cancelar" data-bs-dismiss="modal" onclick="enviarDatos(true)">Confirmar</button>
+                    <button style="margin-left: 50px" type="submit" class="btn btn-cancelar" data-bs-dismiss="modal" onclick="enviarDatos(true)" data-bs-toggle="modal" data-bs-target="#successModal">Confirmar</button>
                 </div>
             </div>
         </div>

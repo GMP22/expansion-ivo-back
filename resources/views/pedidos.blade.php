@@ -13,34 +13,34 @@
 
             <div class="row">
 
-                <div class="col-7 d-flex mb-5 justify-content-between">
-                    <div class="card" style="width: 15rem;">
-                        <div class="card-body mt-3">
-                            <div class="d-flex">
-                                <fa-icon [icon]="faMagnifyingGlass" class="mx-2 icon-calender">
-                                </fa-icon><h2>asdas</h2>
+                <div class="col-10 d-flex mb-5 justify-content-between">
+                    <div class="card shadow-sm border borderless" style="background-color: #EBF3FA; width: 17rem;">
+                        <div class="card-body mt-3 ms-2">
+                            <div class="d-flex mb-3">
+                                <i class="fa-solid fa-truck-fast fa-2x mt-1"></i>
+                                <h1 class="font fs-2 ms-3">{{$numeroPendientes}}</h1>
                             </div>
-                            <h2 class="card-title">Card title</h2>
+                            <h5 style="font-family: manrope; font-weight:900;" class="ms-2">Pedidos Pendientes</h5>
                         </div>
                     </div>
 
-                    <div class="card" style="width: 15rem;">
-                        <div class="card-body mt-3">
-                            <div class="d-flex">
-                                <fa-icon [icon]="faMagnifyingGlass" class="mx-2 icon-calender">
-                                </fa-icon><h2>asdas</h2>
+                    <div  class="card shadow-sm border borderless" style="background-color: #EBF3FA; width: 17rem;">
+                        <div class="card-body mt-3 ms-2">
+                            <div class="d-flex mb-3">
+                                <i class="fa-solid fa-boxes-stacked fa-2x mt-1"></i>
+                                </fa-icon><h1 class="font fs-2 ms-3">{{$numeroAceptados}}</h1>
                             </div>
-                            <h2 class="card-title">Card title</h2>
+                            <h5 style="font-family: manrope; font-weight:900;" class="ms-1">Pedidos Recibidos</h5>
                         </div>
                     </div>
 
-                    <div class="card" style="width: 15rem;">
-                        <div class="card-body mt-3">
-                            <div class="d-flex">
-                                <fa-icon [icon]="faMagnifyingGlass" class="mx-2 icon-calender">
-                                </fa-icon><h2>asdas</h2>
+                    <div  class="card shadow-sm border borderless" style="background-color: #EBF3FA; width: 17rem;">
+                        <div class="card-body mt-3 ms-2">
+                            <div class="d-flex mb-3">
+                                <i class="fa-solid fa-triangle-exclamation fa-2x mt-1"></i>
+                                </fa-icon><h1 class="font fs-2 ms-3">{{$numeroDeInventario}}</h1>
                             </div>
-                            <h2 class="card-title">Card title</h2>
+                            <h5 style="font-family: manrope; font-weight:900;" class="ms-1">Articulos Minimos</h5>
                         </div>
                     </div>
 
@@ -61,14 +61,14 @@
                         </div>
                     </div>
 
-                    <div class="col-5 d-flex flex-row flex-row-reverse h-50">
-                       <a class="btn-cancelar" href="/pedidos/{{Auth::guard('usuario')->user()->servicio->id_servicio}}/crear-pedido">Crear Pedido</a>
+                    <div class="col-4 d-flex flex-row flex-row-reverse h-50">
+                       <a class="btn-cancelar font me-3" href="/pedidos/{{Auth::guard('usuario')->user()->servicio->id_servicio}}/crear-pedido">Crear Pedido</a>
                     </div>
                 </div>
             </div>
 
             <div class="row mt-2">
-                <div class="col-12 px-5">
+                <div class="col-10 ps-5">
 
                     <div id="pendiente">
                     <table class="table table-hover" id="pedidos-pendientes-table">
@@ -106,12 +106,12 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($rdo2 as $pedido)
+                                @foreach($rdo2 as $pedidos)
                                 <tr>
-                                    <td>{{$pedido['id_pedido']}}</td>
-                                    <td>{{$pedido['numero_productos']}}</td>
-                                    <td>{{$pedido['fecha_inicial']}}</td>
-                                    <td>{{$pedido['fecha_aceptada']}}</td>
+                                    <td>{{$pedidos['id_pedidos']}}</td>
+                                    <td>{{$pedidos['numero_productos']}}</td>
+                                    <td>{{$pedidos['fecha_inicial']}}</td>
+                                    <td>{{$pedidos['fecha_aceptada']}}</td>
                                     <td><a href="/pedidos/{{Auth::guard('usuario')->user()->servicio->id_servicio}}/{{$pedido['id_pedido']}}"><i class="fa-solid fa-eye"></i></a></td>
                                 </tr>
                                 @endforeach
@@ -131,10 +131,12 @@
                 emptyTable: ''
             },
             pagingType: "numbers",
-            info: false
+            scrollY: '300px',
+            info: false,
         };
-        new DataTable('#pedidos-pendientes-table', dtOptions);
-        new DataTable('#pedidos-aceptados-table', dtOptions);
+       var tabla1 = new DataTable('#pedidos-pendientes-table', dtOptions);
+       var tabla2 = new DataTable('#pedidos-aceptados-table', dtOptions);
+        
         $('#realizada').hide();
        
 
@@ -144,6 +146,8 @@
             $('#entradas').removeClass("enabled").addClass("disabled");
             $('#pedidos-pendientes-table_wrapper').hide();
             $('#pedidos-aceptados-table_wrapper').show();
+            tabla2.columns.adjust().draw();
+            
         })
 
         $("#entradas").on("click", function(){
@@ -151,6 +155,7 @@
             $('#entradas').removeClass("disabled").addClass("enabled");
             $('#pedidos-aceptados-table_wrapper').hide();
             $('#pedidos-pendientes-table_wrapper').show();
+            tabla1.columns.adjust().draw();
         })
      
 </script>

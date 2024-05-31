@@ -9,35 +9,35 @@
 
 <div class="row">
     <div class="col-12 font mt-5 ms-5">
-        <p class="h1" style="font-weight: bold;">Detalles de Pedido</p>
+        <p class="h1" style="font-weight: bold;">Detalles de Solicitud</p>
     </div>
 </div>
 
 <div class="row my-5">
     <div class="row px-5">
         <div class="col-4">
-            <h2>Numero de Pedido</h2>
-            <h3 class="font" style="font-weight: bold;">{{$rdo['id_pedido']}}</h3>
+            <h4>Numero de Pedido</h4>
+            <h5 class="font" style="font-weight: bold;">{{$rdo['id_pedido']}}</h5>
         </div>
         <div class="col-4">
-            <h2>Nombre de Solicitante</h2>
-            <h3 class="font" style="font-weight: bold;">{{$rdo['nombre_jefe']}}</h3>
+            <h4>Nombre de Solicitante</h4>
+            <h5 class="font" style="font-weight: bold;">{{$rdo['nombre_jefe']}}</h5>
         </div>
         <div class="col-4">
-            <h2>Numero de Productos</h2>
-            <h3 class="font">{{$rdo['numero_productos']}}</h3>
+            <h4>Numero de Productos</h4>
+            <h5 class="font">{{$rdo['numero_productos']}}</h5>
         </div>
     </div>
     
     <div class="row px-5 mt-5">
         <div class="col-4">
-            <h2>Fecha de Pedido</h2>
-            <h3 class="font" style="font-weight: bold;">{{$rdo['fecha_inicial']}}</h3>
+            <h4>Fecha de Pedido</h4>
+            <h5 class="font" style="font-weight: bold;">{{$rdo['fecha_inicial']}}</h5>
         </div>
         @if ($rdo['fecha_aceptada'] != null)
         <div class="col-4">
-            <h2>Fecha Aceptada</button></h2>
-            <h3 class="font" style="font-weight: bold;">{{$rdo['fecha_aceptada']}}</h3>
+            <h4>Fecha Aceptada</button></h4>
+            <h5 class="font" style="font-weight: bold;">{{$rdo['fecha_aceptada']}}</h5>
         </div>
         @endif
     </div>

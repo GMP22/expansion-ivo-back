@@ -86,46 +86,76 @@ class JefeDepartamentoController extends Controller
 
     public function pedidos($id_servicio){   
         $pedidosPendientes = Pedidos::where("estado", "Pendiente")->where("id_servicio", $id_servicio)->where("es_departamento", true)->get();
-        $pedidosAceptados = Pedidos::where("estado", "Aceptada")->where("id_servicio", $id_servicio)->where("es_departamento", true)->get();
+        $pedidosAceptados = Pedidos::where("estado", "Aceptada")->where("id_servicio", $id_servicio)->where("es_departamento", true) -> get();
         $rdo1 = []; 
         $rdo2 = [];
-
-        foreach ($pedidosPendientes as $key => $value) {
+        $inventario = InventarioClinica::all();
+        $numeroDeInventario = 0;
+        $numeroPendientes = $pedidosPendientes -> count();
+        $numeroAceptados = $pedidosAceptados -> count();
+        foreach($inventario as $key => $value){
+					if ($value -> inventarioDepartamentos ->where("id_servicio", $id_servicio) -> first() != null) {
+							if ($value -> inventarioDepartamentos ->where("id_servicio", $id_servicio) -> first() -> pivot -> estado == "En Minimos") {
+									$numeroDeInventario++;
+							}
+            }
+        }
+		
+        foreach ($pedidosPendientes as $key2 => $value2) {
             $p = [
-                'id_pedido' => $value->id_pedido,
-                'numero_productos'=> $value->articulos->count(),
-                'fecha_inicial' => $value->fecha_inicial,
+                'id_pedido' => $value2->id_pedido,
+                'numero_productos'=> $value2->articulos->count(),
+                'fecha_inicial' => $value2->fecha_inicial,
             ];
             $rdo1 [] = $p;
         }
 
-        foreach ($pedidosAceptados as $key2 => $value2) {
+        foreach ($pedidosAceptados as $key3 => $value3) {
             $a = [
-                'id_pedido' => $value2->id_pedido,
-                'numero_productos'=> $value2->articulos->count(),
-                'fecha_inicial' => $value2->fecha_inicial,
-                'fecha_aceptada' => $value2->fecha_aceptada,
+                'id_pedidos' => $value3->id_pedido,
+                'numero_productos'=> $value3->articulos->count(),
+                'fecha_inicial' => $value3->fecha_inicial,
+                'fecha_aceptada' => $value3->fecha_aceptada,
             ];
             $rdo2 [] = $a;
         }
 
         //{{Auth::guard('usuario')->user()->servicio->id_servicio}}
-        return view('pedidos', compact('rdo1', 'rdo2'));
+        return view('pedidos', compact('rdo1', 'rdo2', 'numeroDeInventario', 'numeroPendientes', 'numeroAceptados'));
     }
 
-    public function crearPedidos(){   
+    public function crearPedidos($id_servicio){   
         $articulos = InventarioClinica::all();
 
         $rdo = [];
+
+        $breadcrumbs = [
+            ['volver' => 'Volver', 'routa-volver' => route('pedidos', $id_servicio)],
+            ['nav-opcion-1' => 'Pedidos', 'routa-opcion-1' => route('pedidos', $id_servicio)],
+            ['nav-opcion-2' => 'Crear Pedido', 'routa-opcion-2' => null],
+        ];
+
         foreach ($articulos as $key => $value) {
+            $nLotes = 0;
+            $estado = "N/A";
+
+            if ($value ->  inventarioDepartamentos -> where("id_servicio", $id_servicio) -> first() != null) {
+                $nLotes = $value ->  inventarioDepartamentos -> where("id_servicio", $id_servicio) -> first() -> pivot -> lotes_disponibles;
+                $estado = $value ->  inventarioDepartamentos -> where("id_servicio", $id_servicio) -> first() -> pivot -> estado;
+            }
+
             $p = [
                 "id_articulo" => $value->id_articulo,
                 "nombre" => $value->articulo->nombre,
+                "stock_actual" => $nLotes,
+                "nombre_categoria" => $value->articulo->categoria->nombre_categoria,
+                "estado" => $estado,
             ];
+
             $rdo [] = $p;
         }
 
-        return view('components.crear-pedido', compact("rdo"));
+        return view('components.crear-pedido', compact("rdo", 'breadcrumbs'));
     }
    
     public function detallesPedido($idServicio, $idPedido){
@@ -323,7 +353,7 @@ class JefeDepartamentoController extends Controller
             $pedido -> articulos()->attach($value2["id_articulo"], ["id_proveedor" => null, "lotes_recibidos" => $value2["cantidad"]]);
         }
 
-        return $id_servicio;
+        return redirect()->route('pedidos', $id_servicio);
     }
 
     public function aceptarSolicitud($idServicio, $idSolicitud, Request $request){

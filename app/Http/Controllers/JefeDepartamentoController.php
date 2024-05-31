@@ -149,9 +149,9 @@ class JefeDepartamentoController extends Controller
         $detalles = [];
 
         $breadcrumbs = [
-            ['volver' => 'Volver', 'routa-volver' => route('solicitudes', $pedido->id_servicio)],
-            ['nav-opcion-1' => 'Solicitudes', 'routa-opcion-1' => route('solicitudes', $pedido->id_servicio)],
-            ['nav-opcion-2' => 'Detalles de Solicitud', 'routa-opcion-2' => null],
+            ['volver' => 'Volver', 'routa-volver' => route('pedidos', $pedido->id_servicio)],
+            ['nav-opcion-1' => 'Pedidos', 'routa-opcion-1' => route('pedidos', $pedido->id_servicio)],
+            ['nav-opcion-2' => 'Detalles de Pedido', 'routa-opcion-2' => null],
         ];
 
         foreach ($articulos as $key => $value) {

@@ -148,6 +148,12 @@ class JefeDepartamentoController extends Controller
         
         $detalles = [];
 
+        $breadcrumbs = [
+            ['volver' => 'Volver', 'routa-volver' => route('solicitudes', $pedido->id_servicio)],
+            ['nav-opcion-1' => 'Solicitudes', 'routa-opcion-1' => route('solicitudes', $pedido->id_servicio)],
+            ['nav-opcion-2' => 'Detalles de Solicitud', 'routa-opcion-2' => null],
+        ];
+
         foreach ($articulos as $key => $value) {
             $d = [
                 'nombre' => $value -> nombre,
@@ -156,7 +162,43 @@ class JefeDepartamentoController extends Controller
             $detalles [] = $d;
         }
         
-        return view('components.detalles-pedido', compact('rdo', 'detalles'));
+        return view('components.detalles-pedido', compact('rdo', 'detalles', 'breadcrumbs'));
+    }
+
+    public function detallesSolicitud($idServicio, $idPedido){
+        $pedido = Pedidos::find($idPedido);
+        $numero_productos = $pedido->articulos->count();
+        $usuario = $pedido->usuario->nombre." ".$pedido->usuario->apellido1;
+        $fecha_inicial = $pedido->fecha_inicial;
+        $fecha_aceptada = $pedido->fecha_aceptada;
+
+        $rdo = [
+            'id_pedido' => $pedido->id_pedido,
+            'nombre_jefe' => $usuario,
+            'numero_productos' => $numero_productos,
+            'fecha_inicial' => $fecha_inicial,
+            'fecha_aceptada' => $fecha_aceptada,
+        ];
+        
+        $articulos = $pedido -> articulos;
+        
+        $detalles = [];
+
+        $breadcrumbs = [
+            ['volver' => 'Volver', 'routa-volver' => route('solicitudes', $pedido->id_servicio)],
+            ['nav-opcion-1' => 'Solicitudes', 'routa-opcion-1' => route('solicitudes', $pedido->id_servicio)],
+            ['nav-opcion-2' => 'Detalles de Solicitud', 'routa-opcion-2' => null],
+        ];
+
+        foreach ($articulos as $key => $value) {
+            $d = [
+                'nombre' => $value -> nombre,
+                'lotes_recibidos' => $value -> pivot -> lotes_recibidos,
+            ];
+            $detalles [] = $d;
+        }
+        
+        return view('components.detalles-solicitud', compact('rdo', 'detalles', 'breadcrumbs'));
     }
 
     public function inventario($idServicio){

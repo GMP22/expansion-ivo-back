@@ -62,7 +62,7 @@
                     </div>
 
                     <div class="col-5 d-flex flex-row flex-row-reverse h-50">
-                        <button type="button"> <a href="/pedidos/{{Auth::guard('usuario')->user()->servicio->id_servicio}}/crear-pedido">Crear Pedido</a></button>
+                       <a class="btn-cancelar" href="/pedidos/{{Auth::guard('usuario')->user()->servicio->id_servicio}}/crear-pedido">Crear Pedido</a>
                     </div>
                 </div>
             </div>
@@ -86,7 +86,7 @@
                                 <td>{{$pedido['id_pedido']}}</td>
                                 <td>{{$pedido['numero_productos']}}</td>
                                 <td>{{$pedido['fecha_inicial']}}</td>
-                                <td><button class="meter" type="button"><a href="/pedidos/{{Auth::guard('usuario')->user()->servicio->id_servicio}}/{{$pedido['id_pedido']}}">Ver Detalles</a></button></td>
+                                <td><a href="/pedidos/{{Auth::guard('usuario')->user()->servicio->id_servicio}}/{{$pedido['id_pedido']}}"><i class="fa-solid fa-eye"></i></a></td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -112,7 +112,7 @@
                                     <td>{{$pedido['numero_productos']}}</td>
                                     <td>{{$pedido['fecha_inicial']}}</td>
                                     <td>{{$pedido['fecha_aceptada']}}</td>
-                                    <td><button class="meter" type="button"><a href="/pedidos/{{Auth::guard('usuario')->user()->servicio->id_servicio}}/{{$pedido['id_pedido']}}">Ver Detalles</a></button></td>
+                                    <td><a href="/pedidos/{{Auth::guard('usuario')->user()->servicio->id_servicio}}/{{$pedido['id_pedido']}}"><i class="fa-solid fa-eye"></i></a></td>
                                 </tr>
                                 @endforeach
                             </tbody>

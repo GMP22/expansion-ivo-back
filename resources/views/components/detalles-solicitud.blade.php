@@ -20,20 +20,16 @@
             <h3 class="font" style="font-weight: bold;">{{$rdo['id_pedido']}}</h3>
         </div>
         <div class="col-4">
-            <h2>Departamento Solicitante</h2>
-            <h3 class="font" style="font-weight: bold;">{{$rdo['nombre_departamento']}}</h3>
-        </div>
-        <div class="col-4">
             <h2>Nombre de Solicitante</h2>
             <h3 class="font" style="font-weight: bold;">{{$rdo['nombre_jefe']}}</h3>
+        </div>
+        <div class="col-4">
+            <h2>Numero de Productos</h2>
+            <h3 class="font">{{$rdo['numero_productos']}}</h3>
         </div>
     </div>
     
     <div class="row px-5 mt-5">
-        <div class="col-4">
-            <h2>Numero de Productos</h2>
-            <h3 class="font" style="font-weight: bold;">{{$rdo['numero_productos']}}</h3>
-        </div>
         <div class="col-4">
             <h2>Fecha de Pedido</h2>
             <h3 class="font" style="font-weight: bold;">{{$rdo['fecha_inicial']}}</h3>

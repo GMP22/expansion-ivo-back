@@ -3,10 +3,9 @@
 @section('content')
 
     <div class="row">
-
         <div class="row mt-4">
             <div class="col-12 mt-5">
-                <h1 class="title">Solicitudes</h1>
+                <h1 class="title ms-5">Solicitudes</h1>
             </div>
         </div>
 
@@ -44,7 +43,7 @@
                                     <td>{{$pedido['nombre_usuario']}}</td>
                                     <td>{{$pedido['numero_productos']}}</td>
                                     <td>{{$pedido['fecha_inicial']}}</td>
-                                    <td><a href="/pedidos/{{Auth::guard('usuario')->user()->servicio->id_servicio}}/{{$pedido['id_pedido']}}"><i class="fa-solid fa-eye"></i></a> <i class="fa-regular fa-square-check" onclick="mirar({{$pedido['id_pedido']}})"></i></td>
+                                    <td><a href="/solicitudes/{{Auth::guard('usuario')->user()->servicio->id_servicio}}/{{$pedido['id_pedido']}}"><i class="fa-solid fa-eye"></i></a> <i class="fa-regular fa-square-check" onclick="mirar({{$pedido['id_pedido']}})"></i></td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -72,7 +71,7 @@
                                     <td>{{$pedido['numero_productos']}}</td>
                                     <td>{{$pedido['fecha_inicial']}}</td>
                                     <td>{{$pedido['fecha_aceptada']}}</td>
-                                    <td><a href="/pedidos/{{Auth::guard('usuario')->user()->servicio->id_servicio}}/{{$pedido['id_pedido']}}"><i class="fa-solid fa-eye"></i></a></td>
+                                    <td><a href="/solicitudes/{{Auth::guard('usuario')->user()->servicio->id_servicio}}/{{$pedido['id_pedido']}}"><i class="fa-solid fa-eye"></i></a></td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -84,7 +83,7 @@
     </div>
 
 
-<div class="modal fade" id="cambiarMinimos" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="cambiarMinimos" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
         <div class="modal-body p-5">
@@ -109,34 +108,73 @@
             </div>
             
             
-            <div class="row">
-                <div  class="col-12 d-flex justify-content-between">
-                    <button type="button" class="btn btn-cancelar me-5" data-bs-dismiss="modal" onclick="limpiar()">Close</button>
-                    <button style="margin-left: 150px" type="submit" class="btn btn-cancelar " data-bs-dismiss="modal" onclick="enviarDatos(true)">Confirmar</button>
-                </div>
-            </div>  
+                <div class="row">
+                    <div class="col-12 d-flex justify-content-between">
+                        <button type="button" class="btn btn-cancelar me-5" data-bs-dismiss="modal" onclick="limpiar()">Cancelar</button>
+                        <button style="margin-left: 150px" type="submit" class="btn btn-cancelar " data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#confirmarMinimos">Confirmar</button>
+                    </div>
+                </div>  
 
             </div>
       </div>
     </div>
 </div>
  
-<div class="modal fade" id="confirmar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+<div class="modal fade" id="confirmarMinimos" tabindex="-1" data-bs-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Confirmar Solicitud</h5>
-        </div>
+        <div class="modal-body p-5">
+            <p class="font fs-4">¿Esta seguro de querer aceptar esta solicitud?</p>
 
             <p style="display:none;" id="modalConfirmar">Aqui hay un id</p>
 
-            <div>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" onclick="enviarDatos(false)">Confirmar</button>
-            </div>  
+            <div class="row mt-3">
+                <div class="col-12 d-flex justify-content-between">
+                    <button type="button" class="btn btn-cancelar" data-bs-dismiss="modal">Cancelar</button>
+                    <button style="margin-left: 50px" type="submit" class="btn btn-cancelar" data-bs-dismiss="modal" onclick="enviarDatos(true)">Confirmar</button>
+                </div>
+            </div>
+        </div>
       </div>
     </div>
 </div>
+
+<div class="modal fade" id="confirmar" tabindex="-1" data-bs-backdrop="static" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-body p-5">
+            <p class="font fs-4">¿Esta seguro de querer aceptar esta solicitud?</p>
+
+            <p style="display:none;" id="modalConfirmar">Aqui hay un id</p>
+
+            <div class="row mt-3">
+                <div class="col-12 d-flex justify-content-between">
+                    <button type="button" class="btn btn-cancelar" data-bs-dismiss="modal">Cancelar</button>
+                    <button style="margin-left: 50px" type="submit" class="btn btn-cancelar" data-bs-dismiss="modal" onclick="enviarDatos(false)" data-bs-toggle="modal" data-bs-target="#successModal">Confirmar</button>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+<div class="modal fade" id="successModal" tabindex="-1" data-bs-backdrop="static" role="dialog" aria-labelledby="successModalLabel" aria-modal="true" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                    <div class="modal-body rounded-3">
+                        <div class="row modal-header-personalizado">
+                            <i class="fa-solid fa-circle-check modal-icon"></i>
+                        </div>
+                        <div class="row modal-body">
+                            <p>Solicitud Aceptada Exitosamente</p>
+                        </div>
+                        <div class="row modal-footer-personalizado">
+                        <button type="button" class="btn btn-cancelar" data-bs-dismiss="modal">Confirmar</button>
+                    </div>
+                </div>
+            </div>
+       </div>
+ </div>
 
     <form style="display:none;" method="POST">
     @csrf
@@ -186,7 +224,8 @@
         
             id_solicitud = $("#minimos-table").find("tbody").attr("class");
         } else {
-            id_solicitud = $("#modalConfirmar").attr("class");
+            console.log($("#confirmar").find("#modalConfirmar").attr("class"));
+            id_solicitud = $("#confirmar").find("#modalConfirmar").attr("class");
         }
 
         $("form").attr("action", "/solicitudes/{{Auth::guard('usuario')->user()->servicio->id_servicio}}/"+id_solicitud+"/aceptar-solicitud");
@@ -212,7 +251,6 @@
         new DataTable('#pedidos-aceptados-table', dtOptions);
         new DataTable('#minimos-table');
         $('#realizada').hide();
-       
 
         $("#historial").on("click", function(){
             $("#realizada").show();
@@ -228,6 +266,5 @@
             $('#pedidos-aceptados-table_wrapper').hide();
             $('#pedidos-pendientes-table_wrapper').show();
         })
-     
 </script>
 @endsection

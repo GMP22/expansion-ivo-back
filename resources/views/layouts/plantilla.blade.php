@@ -93,7 +93,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-10 px-5">
+        <div class="col-10">
             @yield('content')
         </div>
     </div>

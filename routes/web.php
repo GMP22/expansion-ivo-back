@@ -66,6 +66,7 @@ Route::group(['middleware' => 'gestor'], function(){
 Route::group(['middleware' => 'jefe'], function(){
     Route::get('/solicitudes/{id}', [JefeDepartamentoController::class, 'plantilla'])->name('solicitudes');
     Route::get('/solicitudes/{id}', [JefeDepartamentoController::class, 'solicitudes'])->name('solicitudes');
+    Route::get('/solicitudes/{id}/{idSolicitud}', [JefeDepartamentoController::class, 'detallesSolicitud'])->name('solicitudes.detalles');
     Route::get('/solicitudes/{id}/{idSolicitud}/comprobar-minimos', [JefeDepartamentoController::class, 'verificarMinimosArticulos'])->name('solicitudes.minimos');
     Route::post('/solicitudes/{id}/{idSolicitud}/aceptar-solicitud', [JefeDepartamentoController::class, 'aceptarSolicitud'])->name('solicitudes.aceptar');
     Route::get('/pedidos/{id}', [JefeDepartamentoController::class, 'pedidos'])->name('pedidos');

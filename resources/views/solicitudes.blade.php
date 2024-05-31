@@ -2,10 +2,16 @@
 
 @section('content')
 
-
     <div class="row">
+
+        <div class="row mt-4">
+            <div class="col-12 mt-5">
+                <h1 class="title">Solicitudes</h1>
+            </div>
+        </div>
+
         <div class="col-12 px-5">
-        <div class="row">
+            <div class="row mt-5">
                 <div class="col-6 mb-5 ms-3"> <!--Este apartado despliega los componentes que correspondan a una ruta especifica-->
                     <div class="row font">
                         <div class="col-2 text-center enabled" id="entradas">
@@ -38,7 +44,7 @@
                                     <td>{{$pedido['nombre_usuario']}}</td>
                                     <td>{{$pedido['numero_productos']}}</td>
                                     <td>{{$pedido['fecha_inicial']}}</td>
-                                    <td><button type="button"><a href="/pedidos/{{Auth::guard('usuario')->user()->servicio->id_servicio}}/{{$pedido['id_pedido']}}">Ver Detalles</a></button> <button type="button" onclick="mirar({{$pedido['id_pedido']}})">Aceptar Solicitud</button></td>
+                                    <td><a href="/pedidos/{{Auth::guard('usuario')->user()->servicio->id_servicio}}/{{$pedido['id_pedido']}}"><i class="fa-solid fa-eye"></i></a> <i class="fa-regular fa-square-check" onclick="mirar({{$pedido['id_pedido']}})"></i></td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -66,7 +72,7 @@
                                     <td>{{$pedido['numero_productos']}}</td>
                                     <td>{{$pedido['fecha_inicial']}}</td>
                                     <td>{{$pedido['fecha_aceptada']}}</td>
-                                    <td><button class="meter" type="button"><a href="/pedidos/{{Auth::guard('usuario')->user()->servicio->id_servicio}}/{{$pedido['id_pedido']}}">Ver Detalles</a></button></td>
+                                    <td><a href="/pedidos/{{Auth::guard('usuario')->user()->servicio->id_servicio}}/{{$pedido['id_pedido']}}"><i class="fa-solid fa-eye"></i></a></td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -78,32 +84,39 @@
     </div>
 
 
-
 <div class="modal fade" id="cambiarMinimos" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-        </div>
+        <div class="modal-body p-5">
+            <p class="font fs-4">Los siguientes articulos se encuentran en stocks minimos, escoga la cantidad oportuna:</p>
 
-            <table class="table table-hover" id="minimos-table">
-                <thead>
-                    <th>Nombre</th>
-                    <th>Cantidad</th>
-                </thead>
-                <tbody >
-                <!--- <tr id='id_articulo'>--->
-                    <!---<td> Nombre </td>--->
-                    <!---<td class='cantidad'> Cantidad </td>--->
-                <!---</tr>--->
-                </tbody>
-            </table>
-
-
-            <div>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" onclick="enviarDatos(true)">Confirmar</button>
+                    
+            <div class="row py-5">
+                <div class="col-12">
+                    <table class="table table-hover" id="minimos-table">
+                        <thead>
+                            <th>Nombre</th>
+                            <th>Cantidad</th>
+                        </thead>
+                        <tbody style="background-color: white;">
+                        <!--- <tr id='id_articulo'>--->
+                            <!---<td> Nombre </td>--->
+                            <!---<td class='cantidad'> Cantidad </td>--->
+                        <!---</tr>--->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            
+            <div class="row">
+                <div  class="col-12 d-flex justify-content-between">
+                    <button type="button" class="btn btn-cancelar me-5" data-bs-dismiss="modal" onclick="limpiar()">Close</button>
+                    <button style="margin-left: 150px" type="submit" class="btn btn-cancelar " data-bs-dismiss="modal" onclick="enviarDatos(true)">Confirmar</button>
+                </div>
             </div>  
+
+            </div>
       </div>
     </div>
 </div>
@@ -130,8 +143,14 @@
     @method('POST')
     </form>
 
+<style>
+    #minimos-table_wrapper{
+        width: 450px;
+    }
+</style>
 
 <script type="text/javascript">
+
     function mirar(entrada){
         var modal1 = new bootstrap.Modal(document.getElementById('cambiarMinimos'));
         var modal2 = new bootstrap.Modal(document.getElementById('confirmar'));
@@ -144,7 +163,7 @@
             if (data.length > 1) {
                 $('#minimos-table').DataTable().destroy();
                     for (let index = 0; index < data.length-1; index++) {
-                        $("#minimos-table").find("tbody").append("<tr id="+data[index]["id_articulo"]+"><td>"+ data[index]["nombre_articulo"] +"</td><td> <input type='number' class='cantidad' min='0' max='"+data[index]["lotes_disponibles"]+"' value='"+ data[index]["lotes_disponibles"] +"'></td></tr>");
+                        $("#minimos-table").find("tbody").append("<tr id="+data[index]["id_articulo"]+"><td>"+ data[index]["nombre_articulo"] +"</td><td> <input type='number' class='cantidad form-control' min='0' max='"+data[index]["lotes_disponibles"]+"' value='"+ data[index]["lotes_disponibles"] +"'></td></tr>");
                         $("#minimos-table").find("tbody").addClass(""+data[data.length-1]+"");
                     }
                 $('#minimos-table').DataTable(dtOptions);
@@ -174,17 +193,24 @@
        document.querySelector("form").submit();
     }
 
+    function limpiar(){
+        $('#minimos-table').DataTable().destroy();
+        $("#minimos-table").find("tbody").find("tr").remove();
+        $('#minimos-table').DataTable(dtOptions);
+    }
+
     var dtOptions = {
             language: {
                 url: "//cdn.datatables.net/plug-ins/1.10.16/i18n/Spanish.json",
                 emptyTable: ''
             },
             pagingType: "numbers",
-            info: false
+            info: false,
+            dom: 'rt',
         };
         new DataTable('#pedidos-pendientes-table', dtOptions);
         new DataTable('#pedidos-aceptados-table', dtOptions);
-        new DataTable('#minimos-table', dtOptions);
+        new DataTable('#minimos-table');
         $('#realizada').hide();
        
 

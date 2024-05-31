@@ -126,6 +126,9 @@
 .modal-body{
     background-color: #DCECFB;
 }
+.modal-content{
+    background-color: #DCECFB;
+}
 .modal-personalizado{
     display: flex;
     align-items: center;

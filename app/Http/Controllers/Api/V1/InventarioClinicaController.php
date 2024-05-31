@@ -120,6 +120,39 @@ class InventarioClinicaController extends Controller
         return response()->json($nombres, 200); 
     }
 
+    public function detallesPedidoMedido($idPedido){
+        $pedido = Pedidos::find($idPedido);
+        $numero_productos = $pedido->articulos->count();
+        $fecha_inicial = $pedido->fecha_inicial;
+        $fecha_aceptada = $pedido->fecha_aceptada;
+        $estado = $pedido -> estado;
+
+        $rdo = [
+            "estado" => $estado,
+            "numero_productos" => $numero_productos,
+            "fecha_inicial" => $fecha_inicial,
+            "fecha_aceptada" => $fecha_aceptada,
+        ];
+
+        return response()->json($rdo);
+    }
+
+    public function articulosPedidoMedico($idPedido){
+		$pedido = Pedidos::find($idPedido);
+        $articulos = $pedido -> articulos;
+        $articulosSeleccionados = [];
+		foreach($articulos as $key => $value){
+			$p = [
+				"nombre" => $value -> nombre,
+				'nombre_categoria' => $value -> categoria -> nombre_categoria,
+				'lotes_recibidos' => $value -> pivot -> lotes_recibidos,
+			];
+			$articulosSeleccionados [] = $p;
+		}
+		
+		return response()->json($articulosSeleccionados);
+}
+
     public function detallesArticuloGestor($id){
         $articulo = collect(InventarioClinica::find($id));
         
@@ -135,6 +168,11 @@ class InventarioClinicaController extends Controller
         $info = AlmacenGeneral::find(InventarioClinica::find($idArticulo)->id_articulo);
 
         $articulo -> put('nombre', $info->nombre);
+        return response()->json($articulo, 200); 
+    }
+
+    public function detallesPedidoAutomatico($idUsuario, $idArticulo){
+        $articulo = InventarioClinica::find($idArticulo)->articulo->first()->articuloConPedidosAutomaticos->where("id_usuario", $idUsuario)->first()->pivot->stock_a_pedir;
         return response()->json($articulo, 200); 
     }
 
@@ -242,6 +280,8 @@ class InventarioClinicaController extends Controller
         $articulo -> save();
         return response()->json($articulo -> estado, 200);
     }
+
+
 
     public function nuevaFunctionAutomaticaMedico(Request $request){
         $articulo = InventarioClinica::find($request->id_articulo)->articulo->first();

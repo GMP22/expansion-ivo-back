@@ -94,6 +94,42 @@ class CitaController extends Controller
     /**
      * Update the specified resource in storage.
      */
+
+     public function articuloUsadoPorCita ($idMedico, $idArticulo){
+        
+                $citas = Cita::all() -> where("id_usuario_medico", $idMedico);
+				$resultados = [];
+				foreach($citas as $key => $value){
+						$citaSeleccionada = $value -> articulosEnCita -> first();
+						if($citaSeleccionada != null){
+                            if ($value -> articulosEnCita -> first() -> pivot -> id_articulo == $idArticulo) {
+                                $p = [
+                                    "id_cita" => $citaSeleccionada -> pivot -> id_cita,
+                                    "lotes_usados" => $citaSeleccionada -> pivot -> lotes_usados,
+                                ];
+                                $resultados [] = $p;
+                            }
+						}
+				}
+        return response()->json($resultados);
+    }
+
+    public function buscarCitaId($idCita){
+		$cita = Cita::find($idCita);
+		$usuario = Usuario::find($cita->id_usuario_paciente);
+		$p = [
+						'sip' => $cita ->sip,
+            'nombre' => $usuario ->nombre,
+            'apellido' => $usuario ->apellido1 . " " . $usuario ->apellido2,
+            'hora' => $cita ->hora,
+            'id_cita' => $cita ->id_cita,
+            'estado' => $cita ->estado,
+            'id_paciente' => $cita->id_usuario_paciente,
+		];
+		
+		return response()->json($p);
+        }
+
     public function update(Request $request, Cita $cita)
     {
 

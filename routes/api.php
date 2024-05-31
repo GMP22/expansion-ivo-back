@@ -144,6 +144,12 @@ Route::group([
 
     Route::get('inventario-minimos-medico/{id}', [App\Http\Controllers\Api\V1\InventarioClinicaController::class, 'articulosMinimosMedico']);
     Route::get('inventario-automatico-medico/{id}', [App\Http\Controllers\Api\V1\InventarioClinicaController::class, 'articulosAutomaticosMedico']);
+    Route::get('detalles-pedido-automatico/{idUsuario}/{idArticulo}', [App\Http\Controllers\Api\V1\InventarioClinicaController::class, 'detallesPedidoAutomatico']);
+    Route::get('detalles-pedido-medico/{idPedido}', [App\Http\Controllers\Api\V1\InventarioClinicaController::class, 'detallesPedidoMedido']);
+    Route::get('articulos-pedido-medico/{idPedido}', [App\Http\Controllers\Api\V1\InventarioClinicaController::class, 'articulosPedidoMedico']);
+
+    Route::get('articulo-usado-cita/{idMedico}/{idArticulo}', [App\Http\Controllers\Api\V1\CitaController::class, 'articuloUsadoPorCita']);
+    Route::get('buscar-cita-id/{idCita}', [App\Http\Controllers\Api\V1\CitaController::class, 'buscarCitaId']);
 
     Route::get('detalles-articulo-crear-pedido/{id}', [App\Http\Controllers\Api\V1\AlmacenGeneralController::class, 'detallesArticulosCrearPedido']);
     Route::get('detalles-articulo-segun-proveedor/{idArticulo}/{idProveedor}', [App\Http\Controllers\Api\V1\AlmacenGeneralController::class, 'detallesArticulosSegunProveedor']);

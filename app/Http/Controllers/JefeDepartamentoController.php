@@ -288,7 +288,7 @@ class JefeDepartamentoController extends Controller
                 foreach ($solicitudes as $key => $value) {
                         $z = [
                             "id_solicitud" => $value -> id_pedido,
-                            "nombre" => $value -> usuario -> nombre,
+                            "nombre" => $value -> usuario -> nombre. " " . $value -> usuario -> apellido1,
                             "lotes_recibidos" => $value -> pivot -> lotes_recibidos,
                         ];
                     $solicitudesProcesadas [] = $z;

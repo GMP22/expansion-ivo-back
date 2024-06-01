@@ -179,7 +179,7 @@
                     <div class="col-6">
                         <h3 class="fs-5" style="font-weight: 500;">Cantidad</h3>
                         <input class="form-control" type="number" id="cantidad" min="0" value="1">
-                        <h6 style="display:none;" id="error" class="text-danger">Ingresar Cantidad Valida</h6>
+                        <h6 style="display:none;" id="error" class="text-danger">Ingresa Cantidad Valida</h6>
                     </div>
                 </div>
 

@@ -110,8 +110,8 @@
             
                 <div class="row">
                     <div class="col-12 d-flex justify-content-between">
-                        <button type="button" class="btn btn-cancelar me-5" data-bs-dismiss="modal" onclick="limpiar()">Cancelar</button>
-                        <button style="margin-left: 150px" type="submit" class="btn btn-cancelar " data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#confirmarMinimos">Confirmar</button>
+                        <button type="button" class="btn-cancelar me-5" data-bs-dismiss="modal" onclick="limpiar()">Cancelar</button>
+                        <button style="margin-left: 150px" type="submit" class="btn-cancelar " data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#confirmarMinimos">Confirmar</button>
                     </div>
                 </div>  
 
@@ -131,7 +131,7 @@
             <div class="row mt-3">
                 <div class="col-12 d-flex justify-content-between">
                     <button type="button" class="btn btn-cancelar" data-bs-dismiss="modal">Cancelar</button>
-                    <button style="margin-left: 50px" type="submit" class="btn btn-cancelar" data-bs-dismiss="modal" onclick="enviarDatos(true)" data-bs-toggle="modal" data-bs-target="#successModal">Confirmar</button>
+                    <button style="margin-left: 50px" type="submit" class="btn btn-cancelar" data-bs-dismiss="modal" onclick="enviarDatos(true)">Confirmar</button>
                 </div>
             </div>
         </div>

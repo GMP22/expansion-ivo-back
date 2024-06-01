@@ -235,12 +235,14 @@ class JefeDepartamentoController extends Controller
 	
         $inventario = InventarioClinica::all();
         $articulosEnDepartamento = [];
-        
+        $articulosMinimos = [];
+        $articulosAutomaticos = [];
+
         foreach($inventario as $key => $value){
             
             $pedidos = $value -> articulo -> pedidos -> where('es_departamento', true) -> where('estado', "Aceptada") -> where('id_servicio', $idServicio);
             $fechas = [];
-        
+
             foreach ($pedidos as $key2 => $value2) {
             $fechas [] = $value2 -> fecha_aceptada;
             }
@@ -254,30 +256,61 @@ class JefeDepartamentoController extends Controller
                     "estado" => $value -> inventarioDepartamentos ->where("id_servicio", $idServicio) -> first() -> pivot -> estado,
                     'ultima_fecha_recibida' => $fechas[array_key_last($fechas)],
                 ];
+
+                if ($value -> inventarioDepartamentos ->where("id_servicio", $idServicio) -> first() -> pivot -> estado == "En Minimos") {
+                    $articulosMinimos [] = $p;
+                }
+
+                if ($value -> inventarioDepartamentos ->where("id_servicio", $idServicio) -> first() -> pivot -> pedido_automatico == true) {
+                    $articulosAutomaticos [] = $p;
+                }
+
+                $articulosEnDepartamento [] = $p;
             }
-            
-            $articulosEnDepartamento [] = $p;
         }
     
-        return view('inventario', compact('articulosEnDepartamento'));
+        return view('inventario', compact('articulosEnDepartamento', 'articulosMinimos', 'articulosAutomaticos'));
     }
 
     public function detalleArticulo($idServicio, $idArticulo){
+        $breadcrumbs = [
+            ['volver' => 'Volver', 'routa-volver' => route('inventario', $idServicio)],
+            ['nav-opcion-1' => 'Inventario', 'routa-opcion-1' => route('inventario', $idServicio)],
+            ['nav-opcion-2' => 'Detalles de Articulo', 'routa-opcion-2' => null],
+        ];
+
      $articulo = InventarioClinica::find($idArticulo)->inventarioDepartamentos->where("id_servicio", $idServicio)->first();
       $nombreArticulo= InventarioClinica::find($idArticulo)->articulo->nombre;
       
       $pedidos=InventarioClinica::find($idArticulo)->articulo->pedidos->where("es_departamento", true)->where("estado", "Aceptada")->where("id_servicio", $idServicio);
-             $pedidosProcesados = [];
-            foreach ($pedidos as $key => $value) {
+      $solicitudes=InventarioClinica::find($idArticulo)->articulo->pedidos->where("es_departamento", false)->where("estado", "Aceptada")->where("id_servicio", $idServicio);
+      $solicitudesProcesadas = [];
+                foreach ($solicitudes as $key => $value) {
+                        $z = [
+                            "id_solicitud" => $value -> id_pedido,
+                            "nombre" => $value -> usuario -> nombre,
+                            "lotes_recibidos" => $value -> pivot -> lotes_recibidos,
+                        ];
+                    $solicitudesProcesadas [] = $z;
+                }
+
+        $usuario = Servicio::find($idServicio) -> jefe_departamento;
+        $lotesAutomaticos = 0;
+                if (InventarioClinica::find($idArticulo) -> articulo -> articuloConPedidosAutomaticos -> where("id_usuario", $usuario) -> first() != null) {
+                    $lotesAutomaticos = InventarioClinica::find($idArticulo) -> articulo -> articuloConPedidosAutomaticos -> where("id_usuario", $usuario) -> first()-> pivot -> stock_a_pedir;
+                }
+             
+        $pedidosProcesados = [];
+            foreach ($pedidos as $key => $value2) {
                     $x = [
-                        "id_pedido" => $value -> id_pedido,
-                        "lotes_recibidos" => $value -> pivot -> lotes_recibidos,
+                        "id_pedido" => $value2 -> id_pedido,
+                        "lotes_recibidos" => $value2 -> pivot -> lotes_recibidos,
                     ];
                 $pedidosProcesados [] = $x;
             }
       
       
-        return view('components.detalles-inventario', compact('articulo','nombreArticulo','pedidosProcesados'));
+        return view('components.detalles-inventario', compact('articulo','nombreArticulo','pedidosProcesados', 'solicitudesProcesadas','breadcrumbs', 'lotesAutomaticos'));
     }
 
     public function cambiarMinimos($idServicio, $idArticulo,Request $request){

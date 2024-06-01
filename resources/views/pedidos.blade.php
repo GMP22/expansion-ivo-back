@@ -24,7 +24,7 @@
                         </div>
                     </div>
 
-                    <div  class="card shadow-sm border borderless" style="background-color: #EBF3FA; width: 17rem;">
+                    <div class="card shadow-sm border borderless" style="background-color: #EBF3FA; width: 17rem;">
                         <div class="card-body mt-3 ms-2">
                             <div class="d-flex mb-3">
                                 <i class="fa-solid fa-boxes-stacked fa-2x mt-1"></i>
@@ -34,7 +34,7 @@
                         </div>
                     </div>
 
-                    <div  class="card shadow-sm border borderless" style="background-color: #EBF3FA; width: 17rem;">
+                    <div class="card shadow-sm border borderless" style="background-color: #EBF3FA; width: 17rem;">
                         <div class="card-body mt-3 ms-2">
                             <div class="d-flex mb-3">
                                 <i class="fa-solid fa-triangle-exclamation fa-2x mt-1"></i>

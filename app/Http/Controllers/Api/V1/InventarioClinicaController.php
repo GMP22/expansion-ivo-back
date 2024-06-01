@@ -357,6 +357,17 @@ class InventarioClinicaController extends Controller
 			return response()->json($p);
         }
 
+        public function cuadrosInformativosInventarioGestor(){
+            $minimo = InventarioClinica::all() -> where("estado", "En Minimos") -> count();
+            $automatico = InventarioClinica::all() -> where("pedido_automatico", true) -> count();
+            $p = [
+                "articulos_minimos" => $minimo,
+                "articulos_automaticos" => $automatico,
+            ];
+            return response()->json($p);
+        }
+
+
         public function articulosMinimosMedico($idMedico){
             $articulosMinimos = InventarioClinica::all();
             $nombres = [];

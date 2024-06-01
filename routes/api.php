@@ -142,6 +142,9 @@ Route::group([
     Route::get('cuadros-informativos-pedidos-medico/{id}', [App\Http\Controllers\Api\V1\PedidosController::class, 'cuadrosInformativosPedidosMedico']);
     Route::get('cuadros-informativos-inventario-medico/{id}', [App\Http\Controllers\Api\V1\InventarioClinicaController::class, 'cuadrosInformativosInventarioMedico']);
 
+    Route::get('cuadros-informativos-pedidos-gestor', [App\Http\Controllers\Api\V1\PedidosController::class, 'cuadrosInformativosPedidosGestor']);
+    Route::get('cuadros-informativos-inventario-gestor', [App\Http\Controllers\Api\V1\InventarioClinicaController::class, 'cuadrosInformativosInventarioGestor']);
+
     Route::get('inventario-minimos-medico/{id}', [App\Http\Controllers\Api\V1\InventarioClinicaController::class, 'articulosMinimosMedico']);
     Route::get('inventario-automatico-medico/{id}', [App\Http\Controllers\Api\V1\InventarioClinicaController::class, 'articulosAutomaticosMedico']);
     Route::get('detalles-pedido-automatico/{idUsuario}/{idArticulo}', [App\Http\Controllers\Api\V1\InventarioClinicaController::class, 'detallesPedidoAutomatico']);

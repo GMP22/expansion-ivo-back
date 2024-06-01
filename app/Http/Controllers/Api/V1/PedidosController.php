@@ -402,6 +402,18 @@ class PedidosController extends Controller
 			
 		return response()->json($p);
 }
+
+public function cuadrosInformativosPedidosGestor(){
+    $pedidosPendientes = Pedidos::where("id_servicio", null) -> where("estado", "En Transito") ->where("es_departamento", false)  -> count();
+    $pedidosAceptados = Pedidos::where("id_servicio", null) -> where("estado", "Recibido") ->where("es_departamento", false)  -> count();
+    $inventario = InventarioClinica::all() -> where("estado", "En Minimos") ->  count();
+    $p = [
+        "pedidos_pendientes" => $pedidosPendientes,
+        "pedidos_aceptados" => $pedidosAceptados,
+        "articulosEnMinimos" => $inventario,
+    ];
+    return response()->json($p);
+}
     
 
 }

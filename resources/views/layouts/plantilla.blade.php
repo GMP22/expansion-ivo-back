@@ -52,20 +52,20 @@
                 <div class="col-12 p-0 d-flex flex-column align-items-center">
                     <ul class="nav navbar-nav">
                         <li class="nav-item mt-3">
-                            <a class="nav-link" href="/solicitudes/{{Auth::guard('usuario')->user()->servicio->id_servicio}}">
-                                <i class="fa-solid fa-user mx-2"></i>
+                            <a class="nav-link nav-opcion" href="/solicitudes/{{Auth::guard('usuario')->user()->servicio->id_servicio}}">
+                                <i class="fa-solid fa-hand mx-2"></i>
                                 Solicitudes
                             </a>
                         </li>
                         <li class="nav-item mt-3">
-                            <a class="nav-link" href="/pedidos/{{Auth::guard('usuario')->user()->servicio->id_servicio}}">
-                                <i class="fa-solid fa-user mx-2"></i>
+                            <a class="nav-link nav-opcion" href="/pedidos/{{Auth::guard('usuario')->user()->servicio->id_servicio}}">
+                                <i class="fa-solid fa-dolly mx-2"></i>
                                 Pedidos
                             </a>
                         </li>
                         <li class="nav-item mt-3">
-                            <a class="nav-link" href="/inventario/{{Auth::guard('usuario')->user()->servicio->id_servicio}}">
-                                <i class="fa-solid fa-user mx-2"></i>
+                            <a class="nav-link nav-opcion" href="/inventario/{{Auth::guard('usuario')->user()->servicio->id_servicio}}">
+                                <i class="fa-solid fa-box mx-2"></i>
                                 Inventario
                             </a>
                         </li>

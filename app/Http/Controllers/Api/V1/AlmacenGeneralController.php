@@ -16,10 +16,56 @@ class AlmacenGeneralController extends Controller
     public function articulosCrearPedido()
     {
 
-        $articulos = AlmacenGeneral::all('id_articulo', 'nombre');
+        $articulos = AlmacenGeneral::all();
+        $rdo = [];
+            foreach ($articulos as $key => $value) {
+                $estado = "N/A";
+                $nLotes = 0;
 
-        return response()->json($articulos);
+                if (InventarioClinica::where("id_articulo", $value->id_articulo)->first() != null) {
+                    $nLotes = InventarioClinica::where("id_articulo", $value->id_articulo)->first() -> lotes_disponibles;
+                    $estado = InventarioClinica::where("id_articulo", $value->id_articulo)->first() -> estado;
+                }
+
+                $p = [
+                    "id_articulo" => $value->id_articulo,
+                    "nombre" => $value->nombre,
+                    "nombre_categoria" => $value->categoria->nombre_categoria,
+                    "nLotes" => $nLotes,
+                    "nombre_proveedor" => $estado, // Se reutiliza la interfaz para poder almacenar el estado y con eso marcar el item en el listado
+                ];
+
+                $rdo [] = $p;
+            }
+
+        return response()->json($rdo);
     }
+
+    public function articulosMinimosCrearPedidoGestor(){
+        $articulos = AlmacenGeneral::all();
+
+        $arts = [];
+
+        foreach ($articulos as $key => $value) {
+
+            if (InventarioClinica::where("id_articulo", $value->id_articulo)->first() != null) {
+                if (InventarioClinica::where("id_articulo", $value->id_articulo)-> first() -> estado == "En Minimos") {
+                    $nLotes = InventarioClinica::where("id_articulo", $value->id_articulo)->first() -> lotes_disponibles;
+                    $estado = InventarioClinica::where("id_articulo", $value->id_articulo)->first() -> estado;
+                    $p = [
+                        "id_articulo" => $value->id_articulo,
+                        "nombre" => $value->nombre,
+                        "nombre_categoria" => $value->categoria->nombre_categoria,
+                        "nLotes" => $nLotes,
+                        "nombre_proveedor" => $estado, // Se reutiliza la interfaz para poder almacenar el estado y con eso marcar el item en el listado
+                    ];
+                    $arts []= $p;
+                }
+            }
+        }
+        return response()->json($arts);
+    }
+
 
     public function articulosCrearPedidoMedico($idMedico){
         $articulos = InventarioClinica::all();
@@ -50,10 +96,6 @@ class AlmacenGeneralController extends Controller
         }
         return response()->json($arts);
     }
-    
- /*
-	Esta es la version donde se filtra por el estado
-*/   
     
     public function articulosMinimosCrearPedidoMedico($idMedico){
         $articulos = InventarioClinica::all();
@@ -95,6 +137,14 @@ class AlmacenGeneralController extends Controller
         return response()->json(0);
     }
 
+    public function numeroLotesCrearPedidoGestor($idArticulo){
+        if (InventarioClinica::where("id_articulo", $idArticulo) -> first() != null) {
+            $nLotes = InventarioClinica::where("id_articulo", $idArticulo) -> first() -> lotes_disponibles;
+            return response()->json($nLotes);
+        }
+        return response()->json(0);
+    }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -103,21 +153,16 @@ class AlmacenGeneralController extends Controller
         $articulo = AlmacenGeneral::find($id);
 
         $proveedores = $articulo -> proveedores;
-        $datosFinales=[];
         
-        $categoria = $articulo -> categoria;
         foreach ($proveedores as $key => $value) {
             $paquete = [
                 'id_proveedor' => $value -> id_proveedor,
                 'nombre_proveedor' => $value -> nombre,
             ];
-
             $datosProveedores [] = $paquete;
         }
-        $datosFinales [] = $datosProveedores;
-        $datosFinales [] = $categoria -> nombre_categoria;
 
-        return response()->json($datosFinales);
+        return response()->json($datosProveedores);
     }
 
     public function proveedoresSegunArticulo($idArticulo){

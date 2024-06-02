@@ -10,6 +10,7 @@ use App\Models\Usuario;
 use App\Models\Proveedor;
 use App\Models\Pedidos;
 use App\Models\Medico;
+use App\Models\Servicio;
 use App\Models\AlmacenGeneral;
 
 class InventarioClinicaController extends Controller
@@ -176,6 +177,24 @@ class InventarioClinicaController extends Controller
         return response()->json($articulo, 200); 
     }
 
+    public function detallesPedidoAutomaticoGestor($idUsuario, $idArticulo){
+        
+
+        if (InventarioClinica::find($idArticulo)->articulo->articuloConPedidosAutomaticos->where("id_usuario", $idUsuario)->first()) {
+            $articulo = InventarioClinica::find($idArticulo)->articulo->articuloConPedidosAutomaticos->where("id_usuario", $idUsuario)->first()->pivot;
+            $p = [
+                "id_proveedor" => $articulo -> id_proveedor,
+                "stock_a_pedir" => $articulo -> stock_a_pedir,
+            ];
+            return response()->json($articulo, 200); 
+        }
+            $p = [
+                "id_proveedor" => 0,
+                "stock_a_pedir" => 0,
+            ];
+        return response()->json([$p], 200); 
+    }
+
     public function pedidosConArticuloEspecifico($id){
         $pedidos=InventarioClinica::find($id)->articulo->pedidos->where("es_departamento", false)->where("estado", "Recibido");
         
@@ -254,13 +273,15 @@ class InventarioClinicaController extends Controller
     }
 
     public function nuevaFunctionAutomatica(Request $request){
-        $articulo = AlmacenGeneral::find($request->id_articulo);
+        $articulo = InventarioClinica::find($request->id_articulo);
         $texto = "hola";
-        if ($articulo -> articuloConPedidosAutomaticos->where('id_usuario', $request->id_usuario)->count() == 0) {
-            $articulo -> articuloConPedidosAutomaticos() -> attach($request->id_articulo, ["id_usuario"=>$request->id_usuario, "id_proveedor"=>$request->id_proveedor, "stock_a_pedir"=>$request->cantidad]);
+        if ($articulo ->articulo-> articuloConPedidosAutomaticos->where('id_usuario', $request->id_usuario)->count() == 0) {
+            $articulo ->articulo-> articuloConPedidosAutomaticos() -> attach($request->id_articulo, ["id_usuario"=>$request->id_usuario, "id_proveedor"=>$request->id_proveedor, "stock_a_pedir"=>$request->cantidad]);
             $texto = "creado";
+            $articulo->pedido_automatico=true;
+            $articulo-> save();
         } else {
-            $articulo -> articuloConPedidosAutomaticos() -> updateExistingPivot($request->id_usuario, ["id_proveedor"=>$request->id_proveedor, "stock_a_pedir"=>$request->cantidad]);
+            $articulo ->articulo-> articuloConPedidosAutomaticos() -> updateExistingPivot($request->id_usuario, ["id_proveedor"=>$request->id_proveedor, "stock_a_pedir"=>$request->cantidad]);
             $texto = "actualizado";
         }
         return response()->json($texto, 200);
@@ -280,8 +301,6 @@ class InventarioClinicaController extends Controller
         $articulo -> save();
         return response()->json($articulo -> estado, 200);
     }
-
-
 
     public function nuevaFunctionAutomaticaMedico(Request $request){
         $articulo = InventarioClinica::find($request->id_articulo)->articulo->first();
@@ -306,8 +325,10 @@ class InventarioClinicaController extends Controller
     }       
 
     public function eliminarFuncionAutomatica(Request $request){
-        $articulo = AlmacenGeneral::find($request->id_articulo);
-        $articulo -> articuloConPedidosAutomaticos() -> detach($request->id_usuario);
+        $articuloSeleccionado = InventarioClinica::find($request->id_articulo);
+        $articuloSeleccionado -> pedido_automatico = false;
+        $articuloSeleccionado -> save();
+        $articuloSeleccionado -> articulo -> articuloConPedidosAutomaticos() -> detach($request->id_usuario);
         return response()->json("Eliminado exitosamente el pedido automatico", 200);
     }        
 
@@ -355,7 +376,7 @@ class InventarioClinicaController extends Controller
 			];
 			
 			return response()->json($p);
-        }
+    }
 
         public function cuadrosInformativosInventarioGestor(){
             $minimo = InventarioClinica::all() -> where("estado", "En Minimos") -> count();
@@ -367,6 +388,55 @@ class InventarioClinicaController extends Controller
             return response()->json($p);
         }
 
+        public function articulosMinimosListadoGestor(){
+            $articulosMinimos = InventarioClinica::all();
+            $nombres = [];
+            foreach ($articulosMinimos as $key => $value) {
+                    $articuloSeleccionado = $value;
+                    if($articuloSeleccionado->estado == "En Minimos"){
+                         $p = [
+                            'id_articulo' => $articuloSeleccionado -> id_articulo_clinica,
+                            'nombre' => AlmacenGeneral::find($value -> id_articulo)->nombre,
+                            'nombre_categoria' => AlmacenGeneral::find($value -> id_articulo)->categoria->nombre_categoria,
+                        ];
+                         $nombres[] = $p;
+                    } 
+            }
+            return response()->json($nombres, 200); 
+        }
+        
+        public function articulosAutomaticosGestor(){
+            $articulosMinimos = InventarioClinica::all();
+            $nombres = [];
+            foreach ($articulosMinimos as $key => $value) {
+                    $articuloSeleccionado = $value;
+                    if($articuloSeleccionado->pedido_automatico == true){
+                         $p = [
+                            'id_articulo' => $articuloSeleccionado -> id_articulo_clinica,
+                            'nombre' => AlmacenGeneral::find($value -> id_articulo)->nombre,
+                            'nombre_categoria' => AlmacenGeneral::find($value -> id_articulo)->categoria->nombre_categoria,
+                        ];
+                         $nombres[] = $p;
+                    } 
+            }
+            return response()->json($nombres, 200); 
+        }
+
+        public function solicitudesArticuloEspecifico($idArticulo){
+            $solicitudes=InventarioClinica::find($idArticulo)->articulo->pedidos->where("es_departamento", true)->where("estado", "Aceptada");
+            $rdo = [];
+            foreach ($solicitudes as $key => $value) {
+                $servicio = Servicio::find($value->id_servicio) -> nombre_servicio;
+                $p = [
+                    "id_pedido" => $value -> id_pedido,
+                    "nombre" => $servicio,
+                    "lotes_recibidos" => $value -> pivot -> lotes_recibidos,
+                ];
+
+                $rdo []=  $p;
+            }
+            return response()->json($rdo, 200);
+        }
 
         public function articulosMinimosMedico($idMedico){
             $articulosMinimos = InventarioClinica::all();
@@ -379,7 +449,7 @@ class InventarioClinicaController extends Controller
                          $p = [
                             'id_articulo' => $articuloSeleccionado -> id_articulo_departamento,
                             'nombre' => AlmacenGeneral::find($value -> id_articulo)->nombre,
-                            'nombre_categoria' => AlmacenGeneral::find($value -> id_articulo)->categoria->first()->nombre_categoria,
+                            'nombre_categoria' => AlmacenGeneral::find($value -> id_articulo)->categoria->nombre_categoria,
                         ];
                          $nombres[] = $p;
                     } 
@@ -401,7 +471,7 @@ class InventarioClinicaController extends Controller
                          $p = [
                             'id_articulo' => $articuloSeleccionado -> id_articulo_departamento,
                             'nombre' => AlmacenGeneral::find($value -> id_articulo)->nombre,
-                            'nombre_categoria' => AlmacenGeneral::find($value -> id_articulo)->categoria->first()->nombre_categoria,
+                            'nombre_categoria' => AlmacenGeneral::find($value -> id_articulo)->categoria->nombre_categoria,
                         ];
                          $nombres[] = $p;
                     } 

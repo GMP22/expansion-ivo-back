@@ -63,7 +63,7 @@ Route::group(['middleware' => 'gestor'], function(){
 
 });
 
-
+Route::group(['middleware' => 'jefe'], function(){
     Route::get('/solicitudes/{id}', [JefeDepartamentoController::class, 'plantilla'])->name('solicitudes');
     Route::get('/solicitudes/{id}', [JefeDepartamentoController::class, 'solicitudes'])->name('solicitudes');
     Route::get('/solicitudes/{id}/{idSolicitud}', [JefeDepartamentoController::class, 'detallesSolicitud'])->name('solicitudes.detalles');
@@ -77,6 +77,7 @@ Route::group(['middleware' => 'gestor'], function(){
     Route::get('/inventario/{id}/{idArticulo}', [JefeDepartamentoController::class, 'detalleArticulo'])->name('inventario.detalles');
     Route::post('/inventario/{id}/{idArticulo}/cambiar-minimo', [JefeDepartamentoController::class, 'cambiarMinimos'])->name('inventario.cminimo');
     Route::post('/inventario/{id}/{idArticulo}/pedido-automatico', [JefeDepartamentoController::class, 'funcionAutomatica'])->name('inventario.cAuto');
+});
 
 
 

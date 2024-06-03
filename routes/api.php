@@ -180,7 +180,7 @@ Route::group([
     Route::get('proveedores-pedidos-pendientes/{id}', [App\Http\Controllers\Api\V1\ProveedoresController::class,'pedidosPendientesPorProveedor']);
     Route::get('proveedores-pedidos-recibidos/{id}', [App\Http\Controllers\Api\V1\ProveedoresController::class,'pedidosRecibidosPorProveedor']);
     Route::post('registrar-proveedor', [App\Http\Controllers\Api\V1\ProveedoresController::class,'registrarProveedor']);
-    Route::post('modificar-proveedor', [App\Http\Controllers\Api\V1\ProveedoresController::class,'modificarProveedor']);
+    Route::post('modificar-proveedor/{id}', [App\Http\Controllers\Api\V1\ProveedoresController::class,'modificarProveedor']);
 });
 
 Route::apiResource('v1/pacientes', App\Http\Controllers\Api\V1\PacienteController::class);

@@ -172,6 +172,14 @@ Route::group([
     Route::post('registrar-pedido-medico/{idMedico}', [App\Http\Controllers\Api\V1\PedidosController::class,'registrarPedidosMedico']);
     Route::get('recibir-pedido-gestor/{idArticulo}', [App\Http\Controllers\Api\V1\PedidosController::class,'recibirPedidoGestor']);
     Route::post('aceptar-solicitud-gestor/{idUsuario}/{idPedido}', [App\Http\Controllers\Api\V1\PedidosController::class,'aceptarSolicitudes']);
+
+    Route::get('proveedores', [App\Http\Controllers\Api\V1\ProveedoresController::class,'index']);
+    Route::get('proveedores-numeros', [App\Http\Controllers\Api\V1\ProveedoresController::class,'numeroProveedores']);
+    Route::get('proveedores-modal', [App\Http\Controllers\Api\V1\ProveedoresController::class,'modalProveedores']);
+    Route::get('proveedores-pedidos-pendientes/{id}', [App\Http\Controllers\Api\V1\ProveedoresController::class,'pedidosPendientesPorProveedor']);
+    Route::get('proveedores-pedidos-recibidos/{id}', [App\Http\Controllers\Api\V1\ProveedoresController::class,'pedidosRecibidosPorProveedor']);
+    Route::post('registrar-proveedor', [App\Http\Controllers\Api\V1\ProveedoresController::class,'registrarProveedor']);
+    Route::post('modificar-proveedor', [App\Http\Controllers\Api\V1\ProveedoresController::class,'modificarProveedor']);
 });
 
 Route::apiResource('v1/pacientes', App\Http\Controllers\Api\V1\PacienteController::class);

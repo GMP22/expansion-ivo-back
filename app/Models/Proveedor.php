@@ -17,7 +17,6 @@ class Proveedor extends Model
         'codigo_postal', 
         'direccion',
         'provincia', 
-        'ciudad', 
         'cod_trasmision',
     ];
 

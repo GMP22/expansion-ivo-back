@@ -14,6 +14,11 @@ class ProveedoresController extends Controller
         return response()->json($proveedores);
     }
 
+    public function proveedorSegunId($idProveedor){
+        $proveedor = Proveedor::find($idProveedor);
+        return response()->json($proveedor);
+    }
+
     public function numeroProveedores(){
         $proveedores = Proveedor::all();
         $cantidadDeProveedores = 0;
@@ -119,9 +124,7 @@ class ProveedoresController extends Controller
         $proveedor -> codigo_postal = $request -> codigo_postal;
         $proveedor -> direccion = $request -> direccion;
         $proveedor -> provincia = $request -> provincia;
-        $proveedor -> ciudad = $request -> ciudad;
         $proveedor -> cod_trasmision = $request -> cod_trasmision;
-
         $proveedor -> save();
     }
 
@@ -137,7 +140,6 @@ class ProveedoresController extends Controller
         $proveedor -> codigo_postal = $request -> codigo_postal;
         $proveedor -> direccion = $request -> direccion;
         $proveedor -> provincia = $request -> provincia;
-        $proveedor -> ciudad = $request -> ciudad;
         $proveedor -> cod_trasmision = $request -> cod_trasmision;
 
         $proveedor -> save();

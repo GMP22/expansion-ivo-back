@@ -175,6 +175,7 @@ Route::group([
 
     Route::get('proveedores', [App\Http\Controllers\Api\V1\ProveedoresController::class,'index']);
     Route::get('proveedores-numeros', [App\Http\Controllers\Api\V1\ProveedoresController::class,'numeroProveedores']);
+    Route::get('proveedor-especifico/{id}', [App\Http\Controllers\Api\V1\ProveedoresController::class,'proveedorSegunId']);
     Route::get('proveedores-modal', [App\Http\Controllers\Api\V1\ProveedoresController::class,'modalProveedores']);
     Route::get('proveedores-pedidos-pendientes/{id}', [App\Http\Controllers\Api\V1\ProveedoresController::class,'pedidosPendientesPorProveedor']);
     Route::get('proveedores-pedidos-recibidos/{id}', [App\Http\Controllers\Api\V1\ProveedoresController::class,'pedidosRecibidosPorProveedor']);
